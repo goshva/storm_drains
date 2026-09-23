@@ -1,0 +1,1727 @@
+openapi: 3.0.3
+info:
+  title: Estate Storm Drain Maintenance API
+  version: 1.0.0
+  description: |
+    Backend contract for the estate storm-drain maintenance frontend (roles, checklist
+    levels, objects, RACI responsibility matrix, and a recurring work calendar).
+
+    This document is the source of truth for the Go backend team. It intentionally
+    contains **contracts only** — no implementation.
+
+    ## Real-time notifications (WebSocket)
+
+    The frontend keeps a single WebSocket connection open (`GET /ws/notifications`) for
+    the lifetime of the session. The socket is used **only to invalidate client-side
+    data**, never to transport full resource payloads:
+
+    1. Something changes on the server (an object's status flips, someone ticks off a
+       checklist item, the RACI matrix is edited, a recurring work becomes due, ...).
+    2. The server pushes a small JSON message (`WsNotification`, see
+       `components.schemas.WsNotification`) over the socket. The message carries an
+       `event` name, a human-readable `message` (optional, for a toast/banner), and —
+       critically — a `url` pointing at the REST resource that is now stale.
+    3. The client treats its local cache for that `url` as invalid and performs a plain
+       `GET` request against it (the `method` field is included for forward-compatibility
+       but is currently always `GET`) to fetch the authoritative, up-to-date
+       representation.
+
+    The socket therefore never races the REST layer and never needs its own conflict
+    resolution — REST remains the single source of truth, the socket is just the
+    "something changed, go re-fetch this" signal.
+
+    ### Handshake
+    Browsers cannot set custom headers on the WebSocket upgrade request, so the access
+    token is passed as a query parameter:
+
+    ```
+    wss://api.example.com/api/v1/ws/notifications?token=<JWT access token>
+    ```
+
+    ### Heartbeat
+    The server sends a `ping` control frame every 30s; the client must reply with `pong`
+    (handled automatically by browser WebSocket implementations). If no frame (data or
+    ping) is received for 60s the client should treat the connection as dead and
+    reconnect with backoff.
+
+    ### Example message
+    ```json
+    {
+      "event": "object.updated",
+      "url": "/api/v1/objects/8f14e2b1-9c3a-4b2d-9f0e-2a6b7c8d9e10",
+      "method": "GET",
+      "resourceType": "object",
+      "resourceId": "8f14e2b1-9c3a-4b2d-9f0e-2a6b7c8d9e10",
+      "occurredAt": "2026-09-23T09:14:00Z",
+      "message": "Колодец смотровой: подпор воды, требуется внеплановая прочистка"
+    }
+    ```
+
+    ## Recurring work calendar
+
+    `CalendarWork` is a *definition* of recurring maintenance (e.g. "промывка лотков,
+    каждые 2 недели по понедельникам"). The server expands each definition into concrete
+    `CalendarOccurrence` instances; the frontend renders occurrences on a calendar and
+    checks them off individually. `notifyBeforeMinutes` controls how long before a due
+    occurrence the server pushes a `calendar.occurrence.due` WebSocket notification.
+
+    A one-off, non-recurring event is just a `CalendarWork` whose `recurrence.count` is
+    `1` — there is no separate "single occurrence" endpoint, to keep occurrences strictly
+    server-generated from a recurrence rule.
+
+    ## Photo evidence (GPS-tagged attachments)
+
+    Two resources accept photo uploads, matching the frontend's "Фотофиксация с
+    GPS-меткой" action: `POST /objects/{objectId}/attachments` (photo evidence of an
+    object's condition) and `POST /levels/{levelId}/tasks/{taskId}/attachments` (photo
+    evidence for a specific checklist item's current period). Both accept
+    `multipart/form-data` with the image file plus optional `lat`/`lng`/`accuracyMeters`
+    fields captured from the device's geolocation API.
+
+    ## Audit trails
+
+    `GET /objects/{objectId}/history` and `GET /levels/{levelId}/tasks/{taskId}/completions`
+    are read-only, server-populated logs — entries are appended automatically whenever the
+    corresponding `PATCH`/`toggle` call changes state, never created directly by clients.
+
+    ## Forward compatibility: sensors, weather, smart-home
+
+    No sensor/weather integration exists yet, but two low-cost hooks are reserved now so
+    adding one later doesn't require breaking changes: the `source` field on `StormObject`
+    and `CalendarWork` (`internal` today; `sensor` / `weather` / `external` reserved for
+    when a reading or forecast creates/updates a record automatically), and the
+    `sensor.reading.updated` / `weather.updated` entries reserved in `WsNotificationEvent`.
+    Nothing emits them yet — no sensor or weather resource schemas exist until there's a
+    concrete provider to integrate.
+
+servers:
+  - url: https://api.estate-drainage.example.com/api/v1
+    description: Production
+  - url: http://localhost:8080/api/v1
+    description: Local Go backend
+
+tags:
+  - name: Roles
+    description: Static reference data for the five roles in the system.
+  - name: Users
+    description: Staff roster — real people assigned to a role.
+  - name: Objects
+    description: Physical drainage-system objects (dождеприёмники, колодцы, etc.) and their status.
+  - name: Tasks
+    description: Per-level checklist definitions and completion state.
+  - name: RACI Matrix
+    description: Responsibility matrix (R/A/C/I) editable by the administrator.
+  - name: Calendar
+    description: Recurring maintenance work definitions and their scheduled occurrences.
+  - name: Notifications
+    description: WebSocket push channel used to invalidate stale REST data.
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ---------------------------------------------------------------- Roles
+  /roles:
+    get:
+      tags: [Roles]
+      summary: List all roles
+      description: Static reference data (owner, four operational levels, admin). Read-only.
+      operationId: listRoles
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ---------------------------------------------------------------- Users
+  /users:
+    get:
+      tags: [Users]
+      summary: List staff roster
+      operationId: listUsers
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - name: roleId
+          in: query
+          description: Filter by role
+          schema:
+            $ref: '#/components/schemas/RoleId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Users]
+      summary: Add a user to the roster
+      description: Admin-only. Assigns an existing person to one of the fixed roles.
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /users/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Users]
+      summary: Get a user
+      operationId: getUser
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Users]
+      summary: Update a user (e.g. reassign role)
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Users]
+      summary: Remove a user from the roster
+      operationId: deleteUser
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # -------------------------------------------------------------- Objects
+  /objects:
+    get:
+      tags: [Objects]
+      summary: List drainage-system objects
+      operationId: listObjects
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ObjectStatus'
+        - name: levelId
+          in: query
+          description: Only objects whose responsibility includes this operational level
+          schema:
+            $ref: '#/components/schemas/RoleId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Objects]
+      summary: Register a new object
+      description: Admin-only.
+      operationId: createObject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StormObject'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /objects/{objectId}:
+    parameters:
+      - name: objectId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Objects]
+      summary: Get an object
+      description: This is the URL a `WsNotification` with `event=object.*` points to.
+      operationId: getObject
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StormObject'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Objects]
+      summary: Update an object (status, issue note, zone, responsible levels, ...)
+      operationId: updateObject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StormObject'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Objects]
+      summary: Delete an object
+      description: Admin-only.
+      operationId: deleteObject
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /objects/{objectId}/attachments:
+    parameters:
+      - name: objectId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Objects]
+      summary: List an object's photo evidence
+      operationId: listObjectAttachments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attachment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [Objects]
+      summary: Upload a GPS-tagged photo of an object
+      description: Backs the frontend's "Фотофиксация с GPS-меткой" action.
+      operationId: createObjectAttachment
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttachmentUpload'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /objects/{objectId}/attachments/{attachmentId}:
+    parameters:
+      - name: objectId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: string
+    delete:
+      tags: [Objects]
+      summary: Delete a photo
+      operationId: deleteObjectAttachment
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /objects/{objectId}/history:
+    parameters:
+      - name: objectId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Objects]
+      summary: Status-change audit trail
+      description: Read-only. A new entry is appended automatically every time `PATCH /objects/{objectId}` changes `status` or `issue` — entries cannot be created directly.
+      operationId: listObjectHistory
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectStatusChange'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------- Tasks
+  /levels/{levelId}/tasks:
+    parameters:
+      - name: levelId
+        in: path
+        required: true
+        description: One of the four operational levels (l1-l4)
+        schema:
+          $ref: '#/components/schemas/OperationalLevelId'
+    get:
+      tags: [Tasks]
+      summary: List a level's checklist, with completion state for the current period
+      description: |
+        The checklist period matches the level's cadence: l1 = day, l2 = ISO week,
+        l3 = month, l4 = quarter. `periodKey` in the response identifies which period
+        `completed` refers to (e.g. `2026-09-23`, `2026-W39`, `2026-09`, `2026-Q3`).
+      operationId: listLevelTasks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskDefinition'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [Tasks]
+      summary: Add a checklist item to a level
+      description: Admin-only.
+      operationId: createTaskDefinition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskDefinitionCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskDefinition'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /levels/{levelId}/tasks/{taskId}:
+    parameters:
+      - name: levelId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OperationalLevelId'
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [Tasks]
+      summary: Edit a checklist item's title/note
+      description: Admin-only. Does not affect past completion history.
+      operationId: updateTaskDefinition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskDefinitionUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskDefinition'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Tasks]
+      summary: Remove a checklist item
+      description: Admin-only. Past completion history for this task is retained.
+      operationId: deleteTaskDefinition
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /levels/{levelId}/tasks/{taskId}/toggle:
+    parameters:
+      - name: levelId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OperationalLevelId'
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      tags: [Tasks]
+      summary: Toggle a checklist item for the current period
+      description: Flips `completed` for the task's current period (done ↔ not done).
+      operationId: toggleTaskCompletion
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskDefinition'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /levels/{levelId}/tasks/{taskId}/completions:
+    parameters:
+      - name: levelId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OperationalLevelId'
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Tasks]
+      summary: Completion history for a checklist item
+      description: Read-only, one record per past period. Use this for reporting ("was the Tuesday round done last month").
+      operationId: listTaskCompletionHistory
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskCompletionRecord'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /levels/{levelId}/tasks/{taskId}/attachments:
+    parameters:
+      - name: levelId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OperationalLevelId'
+      - name: taskId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Tasks]
+      summary: List photo evidence for this checklist item's current period
+      operationId: listTaskAttachments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attachment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [Tasks]
+      summary: Upload a GPS-tagged photo for this checklist item
+      description: Backs the frontend's "Фотофиксация с GPS-меткой" action.
+      operationId: createTaskAttachment
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttachmentUpload'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------- RACI matrix
+  /raci:
+    get:
+      tags: [RACI Matrix]
+      summary: Get the responsibility matrix
+      operationId: listRaciRows
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RaciRow'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [RACI Matrix]
+      summary: Add an operation row to the matrix
+      description: Admin-only.
+      operationId: createRaciRow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RaciRowCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RaciRow'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /raci/{raciId}:
+    parameters:
+      - name: raciId
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [RACI Matrix]
+      summary: Update a row's operation name and/or R/A/C/I assignments
+      description: Admin-only. Send only the fields being changed.
+      operationId: updateRaciRow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RaciRowUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RaciRow'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [RACI Matrix]
+      summary: Remove an operation row
+      description: Admin-only.
+      operationId: deleteRaciRow
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # -------------------------------------------------------------- Calendar
+  /calendar/works:
+    get:
+      tags: [Calendar]
+      summary: List recurring work definitions
+      operationId: listCalendarWorks
+      parameters:
+        - name: levelId
+          in: query
+          schema:
+            $ref: '#/components/schemas/OperationalLevelId'
+        - name: active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalendarWork'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Calendar]
+      summary: Create a recurring work definition
+      description: Admin-only. The server immediately expands the recurrence rule into upcoming `CalendarOccurrence` rows.
+      operationId: createCalendarWork
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarWorkCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarWork'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /calendar/works/{workId}:
+    parameters:
+      - name: workId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Calendar]
+      summary: Get a recurring work definition
+      operationId: getCalendarWork
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarWork'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Calendar]
+      summary: Update a recurring work definition (recurrence, title, active flag, ...)
+      description: |
+        Admin-only. Changing `recurrence` re-expands all **future** (not-yet-occurred)
+        occurrences; past/completed occurrences are left untouched.
+      operationId: updateCalendarWork
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarWorkUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarWork'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Calendar]
+      summary: Delete a recurring work definition
+      description: Admin-only. Cancels all future occurrences; past occurrences are kept for history.
+      operationId: deleteCalendarWork
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /calendar/occurrences:
+    get:
+      tags: [Calendar]
+      summary: List scheduled occurrences in a date range
+      description: Used to render the calendar grid. `from`/`to` are inclusive, ISO date.
+      operationId: listCalendarOccurrences
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: levelId
+          in: query
+          schema:
+            $ref: '#/components/schemas/OperationalLevelId'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/CalendarOccurrenceStatus'
+        - name: workId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarOccurrenceListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /calendar/occurrences/{occurrenceId}:
+    parameters:
+      - name: occurrenceId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Calendar]
+      summary: Get one occurrence
+      description: This is the URL a `WsNotification` with `event=calendar.occurrence.*` points to.
+      operationId: getCalendarOccurrence
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarOccurrence'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Calendar]
+      summary: Mark an occurrence completed or skipped
+      operationId: updateCalendarOccurrence
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarOccurrenceUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarOccurrence'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------- Notifications
+  /ws/notifications:
+    get:
+      tags: [Notifications]
+      summary: Open the notification WebSocket
+      description: |
+        Not a regular REST call — the client performs a WebSocket upgrade on this URL
+        (`Connection: Upgrade`, `Upgrade: websocket`). Documented here as a `GET` for
+        discoverability since OpenAPI 3.0 has no first-class WebSocket construct.
+
+        On connect, the server does not send a backlog; it only pushes notifications for
+        changes that happen while the socket is open. Clients should do a normal REST
+        fetch of whatever screen they render on load/reconnect, then rely on the socket
+        to know when to re-fetch.
+
+        Every pushed frame is a single JSON-encoded `WsNotification` object (see schema).
+      operationId: openNotificationSocket
+      parameters:
+        - name: token
+          in: query
+          required: true
+          description: Access token (WebSocket upgrade requests can't carry an Authorization header from a browser)
+          schema:
+            type: string
+      responses:
+        '101':
+          description: Switching Protocols — connection upgraded to WebSocket.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Issuance/login is out of scope of this contract — the current frontend is a
+        role-switcher demo with no real auth. Add a `/auth/login` flow here once the
+        backend introduces real accounts.
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: 1-based page number
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSizeParam:
+      name: pageSize
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+
+  responses:
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid access token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Authenticated, but not allowed to perform this action (non-admin write)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: OBJECT_NOT_FOUND
+        message:
+          type: string
+          example: Object 8f14e2b1-9c3a-4b2d-9f0e-2a6b7c8d9e10 not found
+        details:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    RoleId:
+      type: string
+      enum: [owner, l1, l2, l3, l4, admin]
+      description: Fixed set of roles; `owner` and `admin` are non-operational, l1-l4 are the four checklist levels.
+
+    OperationalLevelId:
+      type: string
+      enum: [l1, l2, l3, l4]
+      description: Subset of RoleId that has a checklist / RACI column / calendar level.
+
+    Role:
+      type: object
+      required: [id, name, tag, level, icon, description]
+      properties:
+        id:
+          $ref: '#/components/schemas/RoleId'
+        name:
+          type: string
+          example: Дежурная служба
+        tag:
+          type: string
+          example: Уровень I
+        level:
+          type: integer
+          description: 0 = owner, 1-4 = operational levels, 5 = admin
+          example: 1
+        icon:
+          type: string
+          description: Icon identifier rendered by the frontend's icon sprite
+          example: i-drop
+        description:
+          type: string
+          example: Ежедневный оперативный обход и очистка
+
+    User:
+      type: object
+      required: [id, name, roleId, createdAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: Иван Петров
+        roleId:
+          $ref: '#/components/schemas/RoleId'
+        createdAt:
+          type: string
+          format: date-time
+
+    UserCreate:
+      type: object
+      required: [name, roleId]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        roleId:
+          $ref: '#/components/schemas/RoleId'
+
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        roleId:
+          $ref: '#/components/schemas/RoleId'
+
+    UserListResponse:
+      type: object
+      required: [items, total, page, pageSize]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    ObjectStatus:
+      type: string
+      enum: [ok, warn, crit]
+
+    RecordSource:
+      type: string
+      enum: [internal, sensor, weather, external]
+      default: internal
+      description: |
+        Who/what last created or updated this record. `internal` = a person via this API
+        (everything today). `sensor` / `weather` / `external` are reserved for when an
+        automated integration exists (e.g. a level sensor flipping an object's status, or
+        a Yandex Weather forecast updating a calendar work) — nothing emits these yet.
+
+    StormObject:
+      type: object
+      required: [id, name, zone, icon, status, levels, updatedAt, source]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: Колодец смотровой
+        zone:
+          type: string
+          example: Аллея у пруда
+        icon:
+          type: string
+          example: i-alert
+        status:
+          $ref: '#/components/schemas/ObjectStatus'
+        levels:
+          type: array
+          description: Operational levels responsible for this object
+          items:
+            type: integer
+            minimum: 1
+            maximum: 4
+          example: [3]
+        issue:
+          type: string
+          nullable: true
+          description: Present when status is warn/crit
+          example: Подпор воды, требуется внеплановая прочистка
+        updatedAt:
+          type: string
+          format: date-time
+        source:
+          $ref: '#/components/schemas/RecordSource'
+
+    ObjectCreate:
+      type: object
+      required: [name, zone, status, levels]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        zone:
+          type: string
+          minLength: 1
+        icon:
+          type: string
+          default: i-drop
+        status:
+          $ref: '#/components/schemas/ObjectStatus'
+        levels:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+            maximum: 4
+          minItems: 1
+        issue:
+          type: string
+          nullable: true
+
+    ObjectUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        zone:
+          type: string
+          minLength: 1
+        icon:
+          type: string
+        status:
+          $ref: '#/components/schemas/ObjectStatus'
+        levels:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+            maximum: 4
+        issue:
+          type: string
+          nullable: true
+
+    ObjectListResponse:
+      type: object
+      required: [items, total, page, pageSize]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StormObject'
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    GeoLocation:
+      type: object
+      required: [lat, lng]
+      properties:
+        lat:
+          type: number
+          format: double
+          example: 55.7558
+        lng:
+          type: number
+          format: double
+          example: 37.6173
+        accuracyMeters:
+          type: number
+          nullable: true
+
+    Attachment:
+      type: object
+      required: [id, url, contentType, uploadedAt, uploadedBy]
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: uri
+          description: URL to fetch/display the stored photo
+        contentType:
+          type: string
+          example: image/jpeg
+        sizeBytes:
+          type: integer
+          nullable: true
+        location:
+          allOf:
+            - $ref: '#/components/schemas/GeoLocation'
+          nullable: true
+          description: Device geolocation captured at the moment of the photo, if granted
+        uploadedAt:
+          type: string
+          format: date-time
+        uploadedBy:
+          type: string
+          description: userId
+
+    AttachmentUpload:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          format: binary
+        lat:
+          type: number
+          format: double
+          nullable: true
+        lng:
+          type: number
+          format: double
+          nullable: true
+        accuracyMeters:
+          type: number
+          nullable: true
+
+    ObjectStatusChange:
+      type: object
+      required: [id, status, changedAt]
+      properties:
+        id:
+          type: string
+        status:
+          $ref: '#/components/schemas/ObjectStatus'
+        issue:
+          type: string
+          nullable: true
+        changedAt:
+          type: string
+          format: date-time
+        changedBy:
+          type: string
+          nullable: true
+          description: userId; null if the change was made by an automated source (see RecordSource)
+
+    TaskDefinition:
+      type: object
+      required: [id, levelId, title, note, periodKey, completed]
+      properties:
+        id:
+          type: string
+        levelId:
+          $ref: '#/components/schemas/OperationalLevelId'
+        title:
+          type: string
+          example: Осмотр дождеприёмников
+        note:
+          type: string
+          example: После осадков, весь периметр поместья
+        periodKey:
+          type: string
+          description: Identifies the current period this completion state applies to (see /levels/{levelId}/tasks description)
+          example: '2026-09-23'
+        completed:
+          type: boolean
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedBy:
+          type: string
+          nullable: true
+          description: userId
+
+    TaskDefinitionCreate:
+      type: object
+      required: [title, note]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        note:
+          type: string
+          minLength: 1
+
+    TaskDefinitionUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        note:
+          type: string
+          minLength: 1
+
+    TaskCompletionRecord:
+      type: object
+      required: [periodKey, completed]
+      properties:
+        periodKey:
+          type: string
+          example: '2026-09-22'
+        completed:
+          type: boolean
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedBy:
+          type: string
+          nullable: true
+          description: userId
+
+    RaciValue:
+      type: string
+      enum: [R, A, C, I, '']
+      description: R = исполнитель, A = ответственный, C = согласующий, I = информируемый, '' = not assigned
+
+    RaciAssignments:
+      type: object
+      required: [l1, l2, l3, l4]
+      properties:
+        l1:
+          $ref: '#/components/schemas/RaciValue'
+        l2:
+          $ref: '#/components/schemas/RaciValue'
+        l3:
+          $ref: '#/components/schemas/RaciValue'
+        l4:
+          $ref: '#/components/schemas/RaciValue'
+
+    RaciRow:
+      type: object
+      required: [id, operation, assignments]
+      properties:
+        id:
+          type: string
+        operation:
+          type: string
+          example: Очистка решётки
+        assignments:
+          $ref: '#/components/schemas/RaciAssignments'
+
+    RaciRowCreate:
+      type: object
+      required: [operation]
+      properties:
+        operation:
+          type: string
+          minLength: 1
+        assignments:
+          $ref: '#/components/schemas/RaciAssignments'
+          description: Defaults to all-unassigned ('') if omitted
+
+    RaciRowUpdate:
+      type: object
+      properties:
+        operation:
+          type: string
+          minLength: 1
+        assignments:
+          $ref: '#/components/schemas/RaciAssignments'
+          description: Partial updates within this object are allowed; omit a level key to leave it unchanged.
+
+    RecurrenceFrequency:
+      type: string
+      enum: [DAILY, WEEKLY, MONTHLY, YEARLY]
+
+    Weekday:
+      type: string
+      enum: [MO, TU, WE, TH, FR, SA, SU]
+
+    RecurrenceRule:
+      type: object
+      required: [freq, interval, startDate]
+      description: Subset of iCalendar RRULE sufficient for maintenance scheduling.
+      properties:
+        freq:
+          $ref: '#/components/schemas/RecurrenceFrequency'
+        interval:
+          type: integer
+          minimum: 1
+          default: 1
+          description: e.g. freq=WEEKLY, interval=2 -> every other week
+        byWeekday:
+          type: array
+          items:
+            $ref: '#/components/schemas/Weekday'
+          description: Only meaningful for freq=WEEKLY
+        byMonthDay:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+            maximum: 31
+          description: Only meaningful for freq=MONTHLY
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+          description: Recurrence stops after this date if set
+        count:
+          type: integer
+          nullable: true
+          description: Alternative to endDate — stop after N occurrences. Set to 1 for a one-off, non-recurring event.
+
+    CalendarWork:
+      type: object
+      required: [id, title, levelId, recurrence, notifyBeforeMinutes, active, createdAt, updatedAt, source]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          example: Промывка лотков
+        description:
+          type: string
+          nullable: true
+        levelId:
+          $ref: '#/components/schemas/OperationalLevelId'
+        objectId:
+          type: string
+          nullable: true
+          description: Optionally tie this recurring work to a specific object
+        recurrence:
+          $ref: '#/components/schemas/RecurrenceRule'
+        notifyBeforeMinutes:
+          type: integer
+          minimum: 0
+          default: 60
+          description: How long before a due occurrence the server sends a calendar.occurrence.due WS notification
+        active:
+          type: boolean
+          default: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        source:
+          $ref: '#/components/schemas/RecordSource'
+
+    CalendarWorkCreate:
+      type: object
+      required: [title, levelId, recurrence]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          nullable: true
+        levelId:
+          $ref: '#/components/schemas/OperationalLevelId'
+        objectId:
+          type: string
+          nullable: true
+        recurrence:
+          $ref: '#/components/schemas/RecurrenceRule'
+        notifyBeforeMinutes:
+          type: integer
+          minimum: 0
+          default: 60
+
+    CalendarWorkUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          nullable: true
+        levelId:
+          $ref: '#/components/schemas/OperationalLevelId'
+        objectId:
+          type: string
+          nullable: true
+        recurrence:
+          $ref: '#/components/schemas/RecurrenceRule'
+        notifyBeforeMinutes:
+          type: integer
+          minimum: 0
+        active:
+          type: boolean
+
+    CalendarOccurrenceStatus:
+      type: string
+      enum: [pending, completed, skipped, overdue]
+
+    CalendarOccurrence:
+      type: object
+      required: [id, workId, scheduledAt, status]
+      properties:
+        id:
+          type: string
+        workId:
+          type: string
+        scheduledAt:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/CalendarOccurrenceStatus'
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedBy:
+          type: string
+          nullable: true
+          description: userId
+
+    CalendarOccurrenceUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [completed, skipped]
+
+    CalendarOccurrenceListResponse:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarOccurrence'
+        total:
+          type: integer
+
+    WsNotificationEvent:
+      type: string
+      enum:
+        - object.created
+        - object.updated
+        - object.deleted
+        - task.completion.updated
+        - raci.updated
+        - raci.deleted
+        - user.created
+        - user.updated
+        - user.deleted
+        - calendar.work.updated
+        - calendar.occurrence.due
+        - calendar.occurrence.updated
+        - sensor.reading.updated
+        - weather.updated
+      description: |
+        The last two values are reserved for future sensor/weather integrations (see
+        "Forward compatibility" above) — nothing emits them yet.
+
+    WsNotification:
+      type: object
+      required: [event, url, method, occurredAt]
+      description: |
+        Envelope for every message pushed over `/ws/notifications`. Never carries the
+        full resource — `url` must be fetched via REST to get current data.
+      properties:
+        event:
+          $ref: '#/components/schemas/WsNotificationEvent'
+        url:
+          type: string
+          format: uri-reference
+          description: REST API URL (relative to the server base path) whose cached data is now stale.
+          example: /objects/8f14e2b1-9c3a-4b2d-9f0e-2a6b7c8d9e10
+        method:
+          type: string
+          enum: [GET]
+          default: GET
+          description: HTTP method the client must use against `url` to refresh its data.
+        resourceType:
+          type: string
+          example: object
+        resourceId:
+          type: string
+          example: 8f14e2b1-9c3a-4b2d-9f0e-2a6b7c8d9e10
+        occurredAt:
+          type: string
+          format: date-time
+        message:
+          type: string
+          nullable: true
+          description: Optional human-readable text the frontend may show directly in a toast/banner.
