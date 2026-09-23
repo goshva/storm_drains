@@ -1,5 +1,6 @@
 <script setup>
 import Icon from '../components/Icon.vue'
+import { roleTileClass } from '../utils/roleTile'
 
 const props = defineProps({
   role: { type: Object, required: true }
@@ -12,7 +13,7 @@ const emit = defineEmits(['switch-role'])
     <div class="card card-pad" style="display:flex;align-items:center;gap:14px;">
       <span
         class="row__icon"
-        :class="{ gold: props.role.level === 0 }"
+        :class="roleTileClass(props.role)"
         style="width:52px;height:52px;border-radius:14px;"
       >
         <Icon :name="props.role.icon" />

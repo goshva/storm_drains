@@ -3,6 +3,7 @@ import Icon from '../components/Icon.vue'
 import { useFetch } from '../composables/useFetch'
 import { api } from '../api/client'
 import { formatToday } from '../utils/date'
+import { roleTileClass } from '../utils/roleTile'
 
 const emit = defineEmits(['select'])
 
@@ -31,7 +32,7 @@ const today = formatToday()
         class="row"
         @click="emit('select', role.id)"
       >
-        <span class="row__icon" :class="{ gold: role.level === 0 }">
+        <span class="row__icon" :class="roleTileClass(role)">
           <Icon :name="role.icon" />
         </span>
         <span class="row__body">

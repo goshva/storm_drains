@@ -30,7 +30,15 @@ const roleId = ref(null)
 const activeTab = ref('home')
 
 const role = computed(() => roles.value?.find((r) => r.id === roleId.value) ?? null)
-const tabs = computed(() => (role.value?.level === 0 ? TABS_OWNER : TABS_STAFF))
+// Owner (level 0) and admin (level 5) are both non-operational — neither has
+// a per-level checklist, so neither gets the "tasks" tab / HomeStaffView,
+// which assumes role.id is one of l1-l4 and fetches /mocks/tasks-{id}.json.
+// Routing admin there 404s on tasks-admin.json and crashes on the HTML
+// fallback response. The admin-specific dashboard isn't ported yet (see
+// README) — HomeOwnerView is level-agnostic (just objects + roles) so it
+// doubles as a reasonable admin landing screen until then.
+const isOwnerLike = computed(() => role.value?.level === 0 || role.value?.id === 'admin')
+const tabs = computed(() => (isOwnerLike.value ? TABS_OWNER : TABS_STAFF))
 const title = computed(() => TITLES[activeTab.value] ?? '')
 
 // If the active tab doesn't exist for the current role (e.g. owner has no
@@ -57,7 +65,7 @@ function switchRole() {
         <TopBar :role="role" :title="title" />
 
         <main class="scroll">
-          <HomeOwnerView v-if="activeTab === 'home' && role.level === 0" />
+          <HomeOwnerView v-if="activeTab === 'home' && isOwnerLike" />
           <HomeStaffView
             v-else-if="activeTab === 'home'"
             :role="role"
