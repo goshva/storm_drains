@@ -9,8 +9,8 @@
   "orientation": "portrait",
   "lang": "ru",
   "dir": "ltr",
-  "background_color": "#F6F3EC",
-  "theme_color": "#1F3D34",
+  "background_color": "#F2F2F7",
+  "theme_color": "#007AFF",
   "categories": ["utilities", "productivity"],
   "icons": [
     {
