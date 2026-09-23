@@ -32,17 +32,40 @@ them, shouldn't require touching any view component.
 
 ## What's ported, what isn't
 
-Implemented, all backed by the persistent store: role picker, owner/staff/
-admin home, per-level task checklist (persisted toggle), object list +
-admin add/delete, admin user roster (add/delete, assign to an existing
-role), admin RACI matrix (tap a cell to cycle R/A/C/I, add/delete
-operations, icon-based legend), light/dark/system theme (Profile tab,
-persisted), and installability (manifest + service worker in `public/`, an
-"Установить приложение" button on Profile once the browser fires
-`beforeinstallprompt`).
+Implemented, all backed by the persistent store, matching `api/openapi.yaml`:
 
-Not ported yet: the recurring work calendar UI, photo attachments, object/
-task history endpoints, the SOS protocol sheet, and the offline/
-update-available toast the root app has. `public/mocks/calendar-works.json`
-and `calendar-occurrences.json` exist and validate against the contract, but
-nothing in the UI reads them yet.
+- **Objects** — list, add, edit (with an auto-logged status-change history),
+  delete, GPS-tagged photo attachments (`ObjectDetailView.vue`).
+- **Users** — roster list, add, edit (name/role), delete.
+- **RACI matrix** — list, add/delete rows, tap a cell to cycle R/A/C/I,
+  icon-based legend.
+- **Checklists** — per-level task list with persisted toggle, per-task
+  completion history and GPS-tagged photo attachments (`TasksView.vue`), and
+  admin CRUD over the checklist items themselves (`AdminTasksView.vue`).
+- **Recurring work calendar** — admin can create a work (title, level,
+  freq/interval/start date) and mark its occurrences completed/skipped
+  (`AdminCalendarView.vue`). The full `RecurrenceRule` shape
+  (byWeekday/byMonthDay/endDate/count) is in the store/contract but this
+  simple form only exposes freq+interval+startDate; expanding a rule into
+  every future occurrence is backend business logic out of scope for a
+  static mock, so creating a work seeds exactly one occurrence at its start
+  date.
+- **Theme** (light/dark/system, Profile tab) and **PWA install**
+  (manifest + service worker in `public/`, install button on Profile).
+
+There's no login/session concept (just the role switcher), so wherever the
+contract wants an actor id (`completedBy`, `changedBy`, `uploadedBy`) the
+store is given the current role's id as a stand-in.
+
+Photos are captured for real (`<input type="file" capture>` +
+`navigator.geolocation`) but downscaled to a small JPEG data URL before
+being stored in `localStorage` — full-resolution camera photos would blow
+the ~5-10MB quota after a couple of uploads.
+
+Admin's checklist/calendar management is reachable from the "Обзор" hub's
+management list rather than the bottom tab bar — a 7-tab bar doesn't fit a
+420px frame.
+
+**Not ported**: the SOS protocol sheet and the offline/update-available
+toast the root static app has (unrelated to the mock-API gap analysis this
+work closed).
