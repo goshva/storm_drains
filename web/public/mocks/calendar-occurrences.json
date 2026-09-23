@@ -1,0 +1,29 @@
+{
+  "items": [
+    {
+      "id": "co1",
+      "workId": "cw1",
+      "scheduledAt": "2026-09-21T09:00:00Z",
+      "status": "completed",
+      "completedAt": "2026-09-21T10:15:00Z",
+      "completedBy": "u3"
+    },
+    {
+      "id": "co2",
+      "workId": "cw1",
+      "scheduledAt": "2026-10-05T09:00:00Z",
+      "status": "pending",
+      "completedAt": null,
+      "completedBy": null
+    },
+    {
+      "id": "co3",
+      "workId": "cw2",
+      "scheduledAt": "2026-10-01T09:00:00Z",
+      "status": "pending",
+      "completedAt": null,
+      "completedBy": null
+    }
+  ],
+  "total": 3
+}

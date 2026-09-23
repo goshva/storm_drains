@@ -1,0 +1,52 @@
+[
+  {
+    "id": "q1",
+    "levelId": "l4",
+    "title": "Полное освидетельствование",
+    "note": "Техническое состояние всей системы",
+    "periodKey": "2026-Q3",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  },
+  {
+    "id": "q2",
+    "levelId": "l4",
+    "title": "Сезонная подготовка",
+    "note": "Регламент текущего сезона эксплуатации",
+    "periodKey": "2026-Q3",
+    "completed": true,
+    "completedAt": "2026-08-30T09:00:00Z",
+    "completedBy": "u5"
+  },
+  {
+    "id": "q3",
+    "levelId": "l4",
+    "title": "Анализ эффективности",
+    "note": "Итоги за прошедший период",
+    "periodKey": "2026-Q3",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  },
+  {
+    "id": "q4",
+    "levelId": "l4",
+    "title": "Планирование модернизации",
+    "note": "Бюджет и график ремонтных работ",
+    "periodKey": "2026-Q3",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  },
+  {
+    "id": "q5",
+    "levelId": "l4",
+    "title": "Обновление документации",
+    "note": "Исполнительные схемы сетей (As-built)",
+    "periodKey": "2026-Q3",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  }
+]

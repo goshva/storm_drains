@@ -1,0 +1,44 @@
+[
+  {
+    "id": "cw1",
+    "title": "Промывка лотков",
+    "description": "Полная промывка всех открытых каналов под давлением",
+    "levelId": "l2",
+    "objectId": null,
+    "recurrence": {
+      "freq": "WEEKLY",
+      "interval": 2,
+      "byWeekday": ["MO"],
+      "byMonthDay": [],
+      "startDate": "2026-09-07",
+      "endDate": null,
+      "count": null
+    },
+    "notifyBeforeMinutes": 120,
+    "active": true,
+    "createdAt": "2026-08-01T09:00:00Z",
+    "updatedAt": "2026-08-01T09:00:00Z",
+    "source": "internal"
+  },
+  {
+    "id": "cw2",
+    "title": "Полное освидетельствование системы",
+    "description": "Квартальный технический аудит всей дренажной системы",
+    "levelId": "l4",
+    "objectId": null,
+    "recurrence": {
+      "freq": "MONTHLY",
+      "interval": 3,
+      "byWeekday": [],
+      "byMonthDay": [1],
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "count": null
+    },
+    "notifyBeforeMinutes": 1440,
+    "active": true,
+    "createdAt": "2026-01-01T09:00:00Z",
+    "updatedAt": "2026-01-01T09:00:00Z",
+    "source": "internal"
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "name": "storm-drains-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Vue 3 / Vite prototype of the estate storm-drain maintenance app. Reads its data via fetch() from static mock JSON files under public/mocks that mirror the response shapes in ../api/openapi.yaml, standing in for the future Go backend.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.8"
+  }
+}

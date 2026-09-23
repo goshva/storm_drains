@@ -1,0 +1,13 @@
+{
+  "items": [
+    { "id": "u1", "name": "Иван Петров", "roleId": "l1", "createdAt": "2026-01-12T09:00:00Z" },
+    { "id": "u2", "name": "Сергей Волков", "roleId": "l1", "createdAt": "2026-01-12T09:00:00Z" },
+    { "id": "u3", "name": "Алексей Ким", "roleId": "l2", "createdAt": "2026-01-15T09:00:00Z" },
+    { "id": "u4", "name": "Дмитрий Орлов", "roleId": "l3", "createdAt": "2026-02-01T09:00:00Z" },
+    { "id": "u5", "name": "Николай Гроссман", "roleId": "l4", "createdAt": "2026-02-01T09:00:00Z" },
+    { "id": "u6", "name": "Мария Соколова", "roleId": "owner", "createdAt": "2026-01-01T09:00:00Z" }
+  ],
+  "total": 6,
+  "page": 1,
+  "pageSize": 50
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "w1",
+    "levelId": "l2",
+    "title": "Промывка лотков",
+    "note": "Вода под давлением, все открытые каналы",
+    "periodKey": "2026-W39",
+    "completed": true,
+    "completedAt": "2026-09-21T10:15:00Z",
+    "completedBy": "u3"
+  },
+  {
+    "id": "w2",
+    "levelId": "l2",
+    "title": "Очистка песколовок",
+    "note": "Песколовки и первичные отстойники",
+    "periodKey": "2026-W39",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  },
+  {
+    "id": "w3",
+    "levelId": "l2",
+    "title": "Проверка уклонов",
+    "note": "Геометрия поверхности у дождеприёмников",
+    "periodKey": "2026-W39",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  },
+  {
+    "id": "w4",
+    "levelId": "l2",
+    "title": "Фотофиксация участков",
+    "note": "Проблемные зоны с привязкой к схеме",
+    "periodKey": "2026-W39",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  },
+  {
+    "id": "w5",
+    "levelId": "l2",
+    "title": "Тестовый пролив",
+    "note": "Чистой водой — контроль пропускной способности",
+    "periodKey": "2026-W39",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  }
+]

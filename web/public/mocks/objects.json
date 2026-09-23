@@ -1,0 +1,84 @@
+{
+  "items": [
+    {
+      "id": "o1",
+      "name": "Дождеприёмник",
+      "zone": "Главный въезд",
+      "icon": "i-drop",
+      "status": "ok",
+      "levels": [1],
+      "issue": null,
+      "updatedAt": "2026-09-23T08:10:00Z",
+      "source": "internal"
+    },
+    {
+      "id": "o2",
+      "name": "Лоток открытый",
+      "zone": "Восточный сад",
+      "icon": "i-drop",
+      "status": "warn",
+      "levels": [1, 2],
+      "issue": "Скопление опавшей листвы снижает сток",
+      "updatedAt": "2026-09-21T14:40:00Z",
+      "source": "internal"
+    },
+    {
+      "id": "o3",
+      "name": "Песколовка",
+      "zone": "Западный периметр",
+      "icon": "i-grid",
+      "status": "ok",
+      "levels": [2],
+      "issue": null,
+      "updatedAt": "2026-09-18T11:05:00Z",
+      "source": "internal"
+    },
+    {
+      "id": "o4",
+      "name": "Коллектор №1",
+      "zone": "Хозяйственный двор",
+      "icon": "i-grid",
+      "status": "ok",
+      "levels": [3],
+      "issue": null,
+      "updatedAt": "2026-09-02T09:30:00Z",
+      "source": "internal"
+    },
+    {
+      "id": "o5",
+      "name": "Колодец смотровой",
+      "zone": "Аллея у пруда",
+      "icon": "i-alert",
+      "status": "crit",
+      "levels": [3],
+      "issue": "Подпор воды, требуется внеплановая прочистка",
+      "updatedAt": "2026-09-23T07:55:00Z",
+      "source": "internal"
+    },
+    {
+      "id": "o6",
+      "name": "Насосная камера",
+      "zone": "Нижний парк",
+      "icon": "i-gauge",
+      "status": "ok",
+      "levels": [3, 4],
+      "issue": null,
+      "updatedAt": "2026-08-24T10:00:00Z",
+      "source": "internal"
+    },
+    {
+      "id": "o7",
+      "name": "Водосток кровельный",
+      "zone": "Главный дом, южный фасад",
+      "icon": "i-drop",
+      "status": "warn",
+      "levels": [1],
+      "issue": "Ослабло крепление хомута",
+      "updatedAt": "2026-09-19T16:20:00Z",
+      "source": "internal"
+    }
+  ],
+  "total": 7,
+  "page": 1,
+  "pageSize": 50
+}

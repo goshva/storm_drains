@@ -1,0 +1,22 @@
+[
+  {
+    "id": "r1",
+    "operation": "Очистка решётки",
+    "assignments": { "l1": "R", "l2": "C", "l3": "I", "l4": "I" }
+  },
+  {
+    "id": "r2",
+    "operation": "Тестовый пролив",
+    "assignments": { "l1": "I", "l2": "A", "l3": "C", "l4": "I" }
+  },
+  {
+    "id": "r3",
+    "operation": "Гидродинамика труб",
+    "assignments": { "l1": "I", "l2": "R", "l3": "A", "l4": "C" }
+  },
+  {
+    "id": "r4",
+    "operation": "Бюджет ремонта",
+    "assignments": { "l1": "I", "l2": "I", "l3": "C", "l4": "A" }
+  }
+]

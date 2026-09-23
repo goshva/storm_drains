@@ -1,0 +1,52 @@
+[
+  {
+    "id": "m1",
+    "levelId": "l3",
+    "title": "Гидродинамическая промывка",
+    "note": "Трубопроводы, спецоборудование 150–200 атм",
+    "periodKey": "2026-09",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  },
+  {
+    "id": "m2",
+    "levelId": "l3",
+    "title": "Теледиагностика труб",
+    "note": "Видеокамера, поиск внутренних дефектов",
+    "periodKey": "2026-09",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  },
+  {
+    "id": "m3",
+    "levelId": "l3",
+    "title": "Очистка коллекторов",
+    "note": "Смотровые колодцы глубокого заложения",
+    "periodKey": "2026-09",
+    "completed": true,
+    "completedAt": "2026-09-05T13:00:00Z",
+    "completedBy": "u4"
+  },
+  {
+    "id": "m4",
+    "levelId": "l3",
+    "title": "Проверка герметичности",
+    "note": "Соединения и стыки трубопроводов",
+    "periodKey": "2026-09",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  },
+  {
+    "id": "m5",
+    "levelId": "l3",
+    "title": "Калибровка датчиков",
+    "note": "Уровень воды в автоматизированных узлах",
+    "periodKey": "2026-09",
+    "completed": false,
+    "completedAt": null,
+    "completedBy": null
+  }
+]
