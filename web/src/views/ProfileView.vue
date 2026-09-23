@@ -1,11 +1,19 @@
 <script setup>
 import Icon from '../components/Icon.vue'
 import { roleTileClass } from '../utils/roleTile'
+import { themeState, setTheme } from '../store/theme'
+import { pwaState, isStandalone, promptInstall } from '../store/pwa'
 
 const props = defineProps({
   role: { type: Object, required: true }
 })
 const emit = defineEmits(['switch-role'])
+
+const THEME_OPTIONS = [
+  { value: 'system', label: 'Системная' },
+  { value: 'light', label: 'Светлая' },
+  { value: 'dark', label: 'Тёмная' }
+]
 </script>
 
 <template>
@@ -23,6 +31,28 @@ const emit = defineEmits(['switch-role'])
         <p class="row__meta" style="white-space:normal;">{{ props.role.description }}</p>
       </div>
     </div>
+  </section>
+
+  <section class="block">
+    <div class="block__head"><span class="block__title">Оформление</span></div>
+    <div class="segmented">
+      <button
+        v-for="opt in THEME_OPTIONS"
+        :key="opt.value"
+        type="button"
+        class="segmented__opt"
+        :class="{ 'is-active': themeState.theme === opt.value }"
+        @click="setTheme(opt.value)"
+      >
+        {{ opt.label }}
+      </button>
+    </div>
+  </section>
+
+  <section v-if="pwaState.canInstall && !isStandalone()" class="block">
+    <button class="btn btn--tint" @click="promptInstall">
+      <Icon name="i-download" />Установить приложение
+    </button>
   </section>
 
   <section class="block">

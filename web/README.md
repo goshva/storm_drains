@@ -36,11 +36,13 @@ Implemented, all backed by the persistent store: role picker, owner/staff/
 admin home, per-level task checklist (persisted toggle), object list +
 admin add/delete, admin user roster (add/delete, assign to an existing
 role), admin RACI matrix (tap a cell to cycle R/A/C/I, add/delete
-operations, icon-based legend).
+operations, icon-based legend), light/dark/system theme (Profile tab,
+persisted), and installability (manifest + service worker in `public/`, an
+"Установить приложение" button on Profile once the browser fires
+`beforeinstallprompt`).
 
 Not ported yet: the recurring work calendar UI, photo attachments, object/
-task history endpoints, the SOS protocol sheet, and PWA features (service
-worker, offline indicator, install prompt, light/dark theme toggle) — none
-of these exist in the root static app either except the PWA bits.
-`public/mocks/calendar-works.json` and `calendar-occurrences.json` exist and
-validate against the contract, but nothing in the UI reads them yet.
+task history endpoints, the SOS protocol sheet, and the offline/
+update-available toast the root app has. `public/mocks/calendar-works.json`
+and `calendar-occurrences.json` exist and validate against the contract, but
+nothing in the UI reads them yet.

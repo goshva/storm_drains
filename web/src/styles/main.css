@@ -26,7 +26,7 @@
   --tabbar-bg:rgba(249,249,251,.82);
 }
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --bg:#000000;
     --bg-desktop:#000000;
     --surface:#1C1C1E;
@@ -53,6 +53,33 @@
     --shadow-2:0 22px 44px -20px rgba(0,0,0,.75);
     --tabbar-bg:rgba(20,20,22,.82);
   }
+}
+:root[data-theme="dark"]{
+  --bg:#000000;
+  --bg-desktop:#000000;
+  --surface:#1C1C1E;
+  --surface-2:#2C2C2E;
+  --border:#38383A;
+  --border-soft:#2C2C2E;
+  --text:#F5F5F7;
+  --text-2:#98989D;
+  --text-3:#68686D;
+  --accent:#0A84FF;
+  --accent-strong:#409CFF;
+  --accent-soft:#122A44;
+  --gold:#FF9F0A;
+  --gold-soft:#3A2A0E;
+  --success:#30D158;
+  --success-soft:#12281A;
+  --warning:#FF9F0A;
+  --warning-soft:#3A2A0E;
+  --critical:#FF453A;
+  --critical-soft:#3A1512;
+  --indigo:#7D7AFF;
+  --indigo-soft:#211F3E;
+  --shadow-1:0 1px 2px rgba(0,0,0,.5);
+  --shadow-2:0 22px 44px -20px rgba(0,0,0,.75);
+  --tabbar-bg:rgba(20,20,22,.82);
 }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -231,6 +258,7 @@ section.block{margin-bottom:22px;}
 .btn:active{opacity:.7;}
 .btn svg{width:17px;height:17px;}
 .btn--primary{background:var(--accent);color:#FFFFFF;}
+.btn--tint{background:var(--accent-soft);color:var(--accent);}
 .btn--ghost{background:var(--surface-2);color:var(--text);}
 
 .ring{position:relative;width:52px;height:52px;flex:none;}
