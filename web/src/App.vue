@@ -1,7 +1,6 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
-import { useFetch } from './composables/useFetch'
-import { api } from './api/client'
+import { computed, onMounted, ref, watch } from 'vue'
+import { state as store, initMockStore } from './store/mockStore'
 import TopBar from './components/TopBar.vue'
 import TabBar from './components/TabBar.vue'
 import RolePicker from './views/RolePicker.vue'
@@ -10,6 +9,8 @@ import HomeStaffView from './views/HomeStaffView.vue'
 import TasksView from './views/TasksView.vue'
 import ObjectsView from './views/ObjectsView.vue'
 import ProfileView from './views/ProfileView.vue'
+import AdminUsersView from './views/AdminUsersView.vue'
+import AdminMatrixView from './views/AdminMatrixView.vue'
 
 const TABS_OWNER = [
   { id: 'home', label: 'Сегодня', icon: 'i-home' },
@@ -22,24 +23,35 @@ const TABS_STAFF = [
   { id: 'objects', label: 'Объекты', icon: 'i-grid' },
   { id: 'profile', label: 'Профиль', icon: 'i-user' }
 ]
-const TITLES = { home: 'Сегодня', tasks: 'Задачи', objects: 'Объекты', profile: 'Профиль' }
+const TABS_ADMIN = [
+  { id: 'home', label: 'Обзор', icon: 'i-home' },
+  { id: 'objects', label: 'Объекты', icon: 'i-grid' },
+  { id: 'roles', label: 'Роли', icon: 'i-users' },
+  { id: 'matrix', label: 'Матрица', icon: 'i-admin' },
+  { id: 'profile', label: 'Профиль', icon: 'i-user' }
+]
+const TITLES = {
+  home: 'Сегодня',
+  tasks: 'Задачи',
+  objects: 'Объекты',
+  profile: 'Профиль',
+  roles: 'Роли пользователей',
+  matrix: 'Матрица ответственности'
+}
 
-const { data: roles } = useFetch(api.roles())
+onMounted(initMockStore)
 
 const roleId = ref(null)
 const activeTab = ref('home')
 
-const role = computed(() => roles.value?.find((r) => r.id === roleId.value) ?? null)
-// Owner (level 0) and admin (level 5) are both non-operational — neither has
-// a per-level checklist, so neither gets the "tasks" tab / HomeStaffView,
-// which assumes role.id is one of l1-l4 and fetches /mocks/tasks-{id}.json.
-// Routing admin there 404s on tasks-admin.json and crashes on the HTML
-// fallback response. The admin-specific dashboard isn't ported yet (see
-// README) — HomeOwnerView is level-agnostic (just objects + roles) so it
-// doubles as a reasonable admin landing screen until then.
-const isOwnerLike = computed(() => role.value?.level === 0 || role.value?.id === 'admin')
-const tabs = computed(() => (isOwnerLike.value ? TABS_OWNER : TABS_STAFF))
-const title = computed(() => TITLES[activeTab.value] ?? '')
+const role = computed(() => store.roles.find((r) => r.id === roleId.value) ?? null)
+const isAdmin = computed(() => role.value?.id === 'admin')
+const isOwnerLike = computed(() => role.value?.level === 0 || isAdmin.value)
+const tabs = computed(() => {
+  if (isAdmin.value) return TABS_ADMIN
+  return isOwnerLike.value ? TABS_OWNER : TABS_STAFF
+})
+const title = computed(() => (activeTab.value === 'home' && isAdmin.value ? 'Обзор' : TITLES[activeTab.value] ?? ''))
 
 // If the active tab doesn't exist for the current role (e.g. owner has no
 // "tasks" tab), fall back to home instead of rendering a blank screen.
@@ -59,7 +71,9 @@ function switchRole() {
 <template>
   <div class="stage">
     <div class="app-frame">
-      <RolePicker v-if="!role" @select="selectRole" />
+      <p v-if="!store.ready" class="row__meta" style="padding:20px;">Загрузка…</p>
+
+      <RolePicker v-else-if="!role" @select="selectRole" />
 
       <template v-else>
         <TopBar :role="role" :title="title" />
@@ -72,7 +86,9 @@ function switchRole() {
             @open-tasks="activeTab = 'tasks'"
           />
           <TasksView v-else-if="activeTab === 'tasks'" :role="role" />
-          <ObjectsView v-else-if="activeTab === 'objects'" />
+          <ObjectsView v-else-if="activeTab === 'objects'" :admin-mode="isAdmin" />
+          <AdminUsersView v-else-if="activeTab === 'roles'" />
+          <AdminMatrixView v-else-if="activeTab === 'matrix'" />
           <ProfileView v-else-if="activeTab === 'profile'" :role="role" @switch-role="switchRole" />
         </main>
 

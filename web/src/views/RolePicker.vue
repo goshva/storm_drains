@@ -1,13 +1,11 @@
 <script setup>
 import Icon from '../components/Icon.vue'
-import { useFetch } from '../composables/useFetch'
-import { api } from '../api/client'
-import { formatToday } from '../utils/date'
+import { state as store } from '../store/mockStore'
 import { roleTileClass } from '../utils/roleTile'
+import { formatToday } from '../utils/date'
 
 const emit = defineEmits(['select'])
 
-const { data: roles, loading, error } = useFetch(api.roles())
 const today = formatToday()
 </script>
 
@@ -16,18 +14,15 @@ const today = formatToday()
     <div class="picker__brand">
       <div class="picker__mark"><Icon name="i-shield" /></div>
       <p class="picker__name serif">Поместье · Ливнёвая система</p>
-      <p class="picker__sub">Vue 3 / Vite прототип. Данные загружаются через fetch() из mock-JSON, повторяющего контракт api/openapi.yaml</p>
+      <p class="picker__sub">Vue 3 / Vite прототип. Данные читаются и пишутся через мок-хранилище (mock JSON + localStorage), повторяющее контракт api/openapi.yaml</p>
       <span class="picker__date">{{ today }}</span>
     </div>
 
     <p class="picker__label">Роли в системе</p>
 
-    <p v-if="loading" class="row__meta">Загрузка ролей…</p>
-    <p v-else-if="error" class="row__meta">Не удалось загрузить /mocks/roles.json: {{ error.message }}</p>
-
-    <div v-else class="list">
+    <div class="list">
       <button
-        v-for="role in roles"
+        v-for="role in store.roles"
         :key="role.id"
         class="row"
         @click="emit('select', role.id)"

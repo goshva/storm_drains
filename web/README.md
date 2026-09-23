@@ -2,8 +2,7 @@
 
 An attempt at porting the root `index.html` vanilla-JS PWA to a proper Vue 3 +
 Vite build, on the `dev` branch, to try out the shape of the app described in
-`../api/openapi.yaml` — components load their data with `fetch()` from static
-mock JSON files instead of talking to the real (not-yet-built) Go backend.
+`../api/openapi.yaml`.
 
 ## Run it
 
@@ -14,25 +13,34 @@ npm run dev      # http://localhost:5173
 npm run build     # production build to dist/
 ```
 
-## How the mocks work
+## How the mock store works
 
-`src/api/client.js` maps each resource to a URL under `public/mocks/*.json`.
-Every mock file's shape was validated against `../api/openapi.yaml`'s schemas
-(`UserListResponse`, `ObjectListResponse`, `RaciRow`, `TaskDefinition`,
-`CalendarWork`, ...) with ajv, so it's a faithful stand-in for what the real
-endpoints will return. `src/composables/useFetch.js` is the one place that
-calls `fetch()`; swapping `client.js` to point at real `/api/v1/...` URLs
-later shouldn't require touching any component.
+`src/store/mockStore.js` is the app's single source of truth — a reactive
+store that, on first load, fetches `public/mocks/*.json` (each file's shape
+validated against `../api/openapi.yaml`'s schemas — `UserListResponse`,
+`ObjectListResponse`, `RaciRow`, `TaskDefinition`, ... — with ajv) and then
+persists every mutation (add/delete an object, toggle a checklist item, edit
+the RACI matrix, ...) to `localStorage`, the same role it plays in the root
+static app. Reload the page and your edits are still there; call
+`resetMockStore()` in the browser console and reload to re-seed from the
+mock files.
+
+`src/api/client.js` (used only by the store, for the initial seed) maps each
+resource to its mock URL — swapping it to point at real `/api/v1/...`
+endpoints later, and moving the store's mutations to `fetch()` calls against
+them, shouldn't require touching any view component.
 
 ## What's ported, what isn't
 
-Implemented: role picker, owner/staff home, per-level task checklist (local
-optimistic toggle only — there's no backend to persist it), object list,
-profile / switch-role.
+Implemented, all backed by the persistent store: role picker, owner/staff/
+admin home, per-level task checklist (persisted toggle), object list +
+admin add/delete, admin user roster (add/delete, assign to an existing
+role), admin RACI matrix (tap a cell to cycle R/A/C/I, add/delete
+operations, icon-based legend).
 
-Not ported yet: the admin role's object/roster/RACI-matrix CRUD, the
-recurring work calendar, the SOS protocol sheet, photo attachments, and the
-light/dark theme toggle. `public/mocks/raci.json`, `calendar-works.json` and
-`calendar-occurrences.json` exist and validate against the contract, but
-nothing in the UI reads them yet — they're there for whoever picks up the
-admin/calendar views next.
+Not ported yet: the recurring work calendar UI, photo attachments, object/
+task history endpoints, the SOS protocol sheet, and PWA features (service
+worker, offline indicator, install prompt, light/dark theme toggle) — none
+of these exist in the root static app either except the PWA bits.
+`public/mocks/calendar-works.json` and `calendar-occurrences.json` exist and
+validate against the contract, but nothing in the UI reads them yet.
