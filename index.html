@@ -38,6 +38,8 @@
     --warning-soft:#FFF1DE;
     --critical:#FF3B30;
     --critical-soft:#FFEBE9;
+    --indigo:#5856D6;
+    --indigo-soft:#EAE9FB;
     --shadow-1:0 1px 2px rgba(28,28,30,.04);
     --shadow-2:0 22px 44px -20px rgba(28,28,30,.32);
     --tabbar-bg:rgba(249,249,251,.82);
@@ -66,6 +68,8 @@
       --warning-soft:#3A2A0E;
       --critical:#FF453A;
       --critical-soft:#3A1512;
+      --indigo:#7D7AFF;
+      --indigo-soft:#211F3E;
       --shadow-1:0 1px 2px rgba(0,0,0,.5);
       --shadow-2:0 22px 44px -20px rgba(0,0,0,.75);
       --tabbar-bg:rgba(20,20,22,.82);
@@ -94,6 +98,8 @@
     --warning-soft:#3A2A0E;
     --critical:#FF453A;
     --critical-soft:#3A1512;
+    --indigo:#7D7AFF;
+    --indigo-soft:#211F3E;
     --shadow-1:0 1px 2px rgba(0,0,0,.5);
     --shadow-2:0 22px 44px -20px rgba(0,0,0,.75);
     --tabbar-bg:rgba(20,20,22,.82);
@@ -152,7 +158,7 @@
     background:var(--surface-2);display:flex;align-items:center;justify-content:center;
     color:var(--text);flex:none;
   }
-  .icon-btn--sos{background:var(--critical-soft);color:var(--critical);}
+  .icon-btn--sos{background:var(--critical);color:#FFFFFF;}
   .icon-btn svg{width:19px;height:19px;}
 
   main.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 20px calc(96px + env(safe-area-inset-bottom,0px));}
@@ -194,10 +200,16 @@
   .banner__text{font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.88);margin:0;}
 
   .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .kpi{background:var(--surface);border:none;border-radius:16px;padding:14px;box-shadow:var(--shadow-1);}
-  .kpi__label{font-size:12px;color:var(--text-2);font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+  .kpi{background:var(--surface);border:none;border-radius:16px;padding:14px;box-shadow:var(--shadow-1);text-align:center;}
+  .kpi__label{font-size:12px;color:var(--text-2);font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;}
   .kpi__label svg{width:14px;height:14px;color:var(--text-3);}
-  .kpi__value{font-size:25px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+  .kpi__value{
+    font-size:2em;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-.01em;
+    text-align:center;
+  }
   .kpi__sub{font-size:12px;color:var(--text-3);margin-top:3px;font-variant-numeric:tabular-nums;}
   .kpi__value.c-crit{color:var(--critical);}
   .kpi__value.c-ok{color:var(--success);}
@@ -205,9 +217,10 @@
   .list{background:var(--surface);border:none;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-1);}
   .row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--border-soft);width:100%;background:none;border-left:none;border-right:none;border-top:none;text-align:left;}
   .row:last-child{border-bottom:none;}
-  .row__icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--accent-soft);color:var(--accent);}
+  .row__icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--accent);color:#FFFFFF;}
   .row__icon svg{width:18px;height:18px;}
-  .row__icon.gold{background:var(--gold-soft);color:var(--gold);}
+  .row__icon.gold{background:var(--gold);}
+  .row__icon.indigo{background:var(--indigo);}
   .row__body{flex:1;min-width:0;}
   .row__title{font-size:16px;font-weight:500;margin:0;}
   .row__meta{font-size:13.5px;color:var(--text-2);margin:2px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -225,8 +238,9 @@
   .level-chip.gold{background:var(--gold-soft);color:var(--gold);}
   .level-chip svg{width:12px;height:12px;}
 
-  .obj-card{display:flex;gap:12px;padding:14px;background:var(--surface);border:none;border-radius:16px;text-align:left;width:100%;box-shadow:var(--shadow-1);}
-  .obj-card__icon{width:42px;height:42px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none;}
+  .obj-card{display:flex;align-items:center;gap:10px;padding:14px;background:var(--surface);border:none;border-radius:16px;text-align:left;width:100%;box-shadow:var(--shadow-1);}
+  .obj-card__main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left;background:none;border:none;padding:0;}
+  .obj-card__icon{width:42px;height:42px;border-radius:12px;background:var(--accent);color:#FFFFFF;display:flex;align-items:center;justify-content:center;flex:none;}
   .obj-card__icon svg{width:20px;height:20px;}
   .obj-card__top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}
   .obj-card__name{font-size:16px;font-weight:600;margin:0;}
@@ -301,6 +315,30 @@
   .raci-tag.a{background:var(--gold-soft);color:var(--gold);}
   .raci-tag.c{background:var(--surface-2);color:var(--text-2);}
   .raci-tag.i{background:transparent;color:var(--text-3);}
+  .raci-tag.none{background:var(--surface-2);color:var(--text-3);}
+  button.raci-tag{border:none;font:inherit;cursor:pointer;}
+
+  .raci-legend{display:flex;flex-direction:column;gap:9px;margin-top:12px;}
+  .raci-legend__item{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--text-2);}
+
+  .form-field{margin-bottom:14px;}
+  .form-field:last-child{margin-bottom:0;}
+  .form-field label{display:block;font-size:12.5px;font-weight:600;color:var(--text-2);margin-bottom:6px;}
+  .form-field input[type="text"]{
+    width:100%;font:inherit;font-size:15px;color:var(--text);background:var(--surface-2);
+    border:none;border-radius:12px;padding:12px 13px;
+  }
+  .form-field input[type="text"]::placeholder{color:var(--text-3);}
+  .form-field input[type="text"]:focus{outline:2px solid var(--accent);outline-offset:1px;}
+
+  .chip-toggles{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip-toggle{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:100px;border:none;background:var(--surface-2);color:var(--text-2);font-size:13.5px;font-weight:600;}
+  .chip-toggle svg{width:14px;height:14px;}
+  .chip-toggle.is-active{background:var(--accent);color:#FFFFFF;}
+
+  .list-row-actions{display:flex;align-items:center;gap:10px;}
+  .delete-btn{width:30px;height:30px;border-radius:50%;border:none;background:var(--critical-soft);color:var(--critical);display:flex;align-items:center;justify-content:center;flex:none;}
+  .delete-btn svg{width:14px;height:14px;}
 
   .empty{text-align:center;padding:40px 20px;color:var(--text-3);}
   .empty svg{width:34px;height:34px;margin-bottom:10px;}
@@ -314,9 +352,9 @@
     background:var(--sheet-bg);color:var(--text);border-radius:16px;padding:12px 14px;
     display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-2);
   }
-  .toast__icon{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none;}
+  .toast__icon{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#FFFFFF;display:flex;align-items:center;justify-content:center;flex:none;}
   .toast__icon svg{width:16px;height:16px;}
-  .toast--offline .toast__icon{background:var(--warning-soft);color:var(--warning);}
+  .toast--offline .toast__icon{background:var(--warning);color:#FFFFFF;}
   .toast__text{flex:1;font-size:13.5px;font-weight:500;line-height:1.3;}
   .toast__action{flex:none;background:var(--accent);color:#FFFFFF;border:none;font-size:13px;font-weight:600;padding:8px 13px;border-radius:100px;}
 </style>
@@ -352,6 +390,9 @@
 <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.7L4 15.5"/><path d="M4 20v-4.5h4.5"/></symbol>
 <symbol id="i-wifi-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M8.5 16.3a5 5 0 0 1 7 0"/><path d="M5.3 13a9.5 9.5 0 0 1 3-2"/><path d="M12.7 8.05A9.5 9.5 0 0 1 18.7 10"/><path d="M2 8.8a13.4 13.4 0 0 1 3.6-2.6"/><path d="M15.5 5.4A13.4 13.4 0 0 1 22 8.8"/><path d="M12 19.5h.01"/></symbol>
 <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M7.5 10 12 14.5 16.5 10"/><path d="M4.5 17.5v2a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5v-2"/></symbol>
+<symbol id="i-admin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><path d="M12 3.8v2.3M12 17.9v2.3M20.2 12h-2.3M6.1 12H3.8M17.7 6.3l-1.6 1.6M7.9 16.1l-1.6 1.6M17.7 17.7l-1.6-1.6M7.9 7.9 6.3 6.3"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9.5 7V5.3a1.3 1.3 0 0 1 1.3-1.3h2.4a1.3 1.3 0 0 1 1.3 1.3V7"/><path d="M6.5 7 7.3 19.2A1.5 1.5 0 0 0 8.8 20.6h6.4a1.5 1.5 0 0 0 1.5-1.4L17.5 7"/><path d="M10.2 11v6M13.8 11v6"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15M4.5 12h15"/></symbol>
 </defs>
 </svg>
 
@@ -384,8 +425,10 @@
     {id:'l1', name:'Дежурная служба', tag:'Уровень I', level:1, icon:'i-drop', desc:'Ежедневный оперативный обход и очистка'},
     {id:'l2', name:'Техник по эксплуатации', tag:'Уровень II', level:2, icon:'i-wrench', desc:'Еженедельная промывка лотков и диагностика'},
     {id:'l3', name:'Инженер по эксплуатации', tag:'Уровень III', level:3, icon:'i-gauge', desc:'Ежемесячная гидродинамика и телеинспекция'},
-    {id:'l4', name:'Главный инженер', tag:'Уровень IV', level:4, icon:'i-shield', desc:'Сезонный аудит и стратегическое планирование'}
+    {id:'l4', name:'Главный инженер', tag:'Уровень IV', level:4, icon:'i-shield', desc:'Сезонный аудит и стратегическое планирование'},
+    {id:'admin', name:'Администратор системы', tag:'Администратор', level:5, icon:'i-admin', desc:'Объекты, роли пользователей и матрица ответственности'}
   ];
+  function isOperationalRole(r){ return r.level>=1 && r.level<=4; }
 
   var TASKS = {
     l1:[
@@ -417,7 +460,7 @@
     ]
   };
 
-  var OBJECTS = [
+  var OBJECTS_SEED = [
     {id:'o1', name:'Дождеприёмник', zone:'Главный въезд', icon:'i-drop', status:'ok', updated:'сегодня', levels:[1]},
     {id:'o2', name:'Лоток открытый', zone:'Восточный сад', icon:'i-drop', status:'warn', updated:'2 дня назад', levels:[1,2], issue:'Скопление опавшей листвы снижает сток'},
     {id:'o3', name:'Песколовка', zone:'Западный периметр', icon:'i-grid', status:'ok', updated:'5 дней назад', levels:[2]},
@@ -425,6 +468,15 @@
     {id:'o5', name:'Колодец смотровой', zone:'Аллея у пруда', icon:'i-alert', status:'crit', updated:'сегодня', levels:[3], issue:'Подпор воды, требуется внеплановая прочистка'},
     {id:'o6', name:'Насосная камера', zone:'Нижний парк', icon:'i-gauge', status:'ok', updated:'1 месяц назад', levels:[3,4]},
     {id:'o7', name:'Водосток кровельный', zone:'Главный дом, южный фасад', icon:'i-drop', status:'warn', updated:'4 дня назад', levels:[1], issue:'Ослабло крепление хомута'}
+  ];
+
+  var USERS_SEED = [
+    {id:'u1', name:'Иван Петров', roleId:'l1'},
+    {id:'u2', name:'Сергей Волков', roleId:'l1'},
+    {id:'u3', name:'Алексей Ким', roleId:'l2'},
+    {id:'u4', name:'Дмитрий Орлов', roleId:'l3'},
+    {id:'u5', name:'Николай Гроссман', roleId:'l4'},
+    {id:'u6', name:'Мария Соколова', roleId:'owner'}
   ];
 
   var SEASONS = {
@@ -451,11 +503,18 @@
     ]}
   };
 
-  var RACI = [
+  var RACI_SEED = [
     {op:'Очистка решётки', r:['R','C','I','I']},
     {op:'Тестовый пролив', r:['I','A','C','I']},
     {op:'Гидродинамика труб', r:['I','R','A','C']},
     {op:'Бюджет ремонта', r:['I','I','C','A']}
+  ];
+  var RACI_ROLES = ['I','II','III','IV'];
+  var RACI_LEGEND = [
+    {k:'r', label:'Исполнитель'},
+    {k:'a', label:'Ответственный'},
+    {k:'c', label:'Согласующий'},
+    {k:'i', label:'Информируемый'}
   ];
 
   function icon(id, extraClass){ return '<svg class="'+(extraClass||'')+'"><use href="#'+id+'"></use></svg>'; }
@@ -471,7 +530,17 @@
   var TODAY = todayInfo();
 
   function load(){ try{ var raw=localStorage.getItem(STORAGE_KEY); return raw?JSON.parse(raw):null; }catch(e){ return null; } }
-  function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({role:state.role, checked:state.checked})); }catch(e){} }
+  function save(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        role: state.role,
+        checked: state.checked,
+        objects: state.objects,
+        users: state.users,
+        raci: state.raci
+      }));
+    }catch(e){}
+  }
 
   var THEME_KEY = 'estate_drainage_theme';
   function loadTheme(){ try{ return localStorage.getItem(THEME_KEY)||'system'; }catch(e){ return 'system'; } }
@@ -491,13 +560,19 @@
     role: saved && saved.role ? saved.role : null,
     tab: 'home',
     checked: saved && saved.checked ? saved.checked : {},
+    objects: saved && saved.objects ? saved.objects : JSON.parse(JSON.stringify(OBJECTS_SEED)),
+    users: saved && saved.users ? saved.users : JSON.parse(JSON.stringify(USERS_SEED)),
+    raci: saved && saved.raci ? saved.raci : JSON.parse(JSON.stringify(RACI_SEED)),
     theme: loadTheme(),
     modal: null,
     online: navigator.onLine,
     updateReady: false,
-    canInstall: false
+    canInstall: false,
+    formDraft: null
   };
   applyTheme(state.theme);
+  var nextObjectSeq = state.objects.length + 1;
+  var nextUserSeq = state.users.length + 1;
 
   function isStandalone(){
     return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
@@ -543,12 +618,25 @@
     {id:'objects', label:'Объекты', icon:'i-grid'},
     {id:'profile', label:'Профиль', icon:'i-user'}
   ];
+  var TABS_ADMIN = [
+    {id:'home', label:'Обзор', icon:'i-home'},
+    {id:'objects', label:'Объекты', icon:'i-grid'},
+    {id:'roles', label:'Роли', icon:'i-users'},
+    {id:'matrix', label:'Матрица', icon:'i-admin'},
+    {id:'profile', label:'Профиль', icon:'i-user'}
+  ];
+
+  function roleTileClass(r){
+    if(r.id==='admin') return ' indigo';
+    if(r.level===0) return ' gold';
+    return '';
+  }
 
   function render(){
     var app = document.getElementById('app');
     if(!state.role){ app.innerHTML = renderPicker(); return; }
     var role = roleObj(state.role);
-    var tabs = role.level===0 ? TABS_OWNER : TABS_STAFF;
+    var tabs = role.id==='admin' ? TABS_ADMIN : (role.level===0 ? TABS_OWNER : TABS_STAFF);
     if(!tabs.some(function(t){return t.id===state.tab;})) state.tab='home';
     app.innerHTML = renderHeader(role) + renderMain(role) + renderTabbar(tabs);
   }
@@ -556,7 +644,7 @@
   function renderPicker(){
     var rows = ROLES.map(function(r){
       return '<button class="row" data-action="select-role" data-id="'+r.id+'">'+
-        '<span class="row__icon'+(r.level===0?' gold':'')+'">'+icon(r.icon)+'</span>'+
+        '<span class="row__icon'+roleTileClass(r)+'">'+icon(r.icon)+'</span>'+
         '<span class="row__body"><p class="row__title">'+r.name+'</p><p class="row__meta">'+r.desc+'</p></span>'+
         icon('i-chev-r','row__chev')+
       '</button>';
@@ -574,7 +662,7 @@
   }
 
   function renderHeader(role){
-    var titles = {home:'Сегодня', tasks:'Задачи', objects:'Объекты', levels:'Уровни контроля', profile:'Профиль'};
+    var titles = {home: role.id==='admin' ? 'Обзор' : 'Сегодня', tasks:'Задачи', objects:'Объекты', levels:'Уровни контроля', profile:'Профиль', roles:'Роли пользователей', matrix:'Матрица ответственности'};
     return '<header class="topbar"><div class="topbar__row">'+
       '<div><p class="topbar__eyebrow"><span class="topbar__roleicon" title="'+role.tag+'" aria-label="'+role.tag+'">'+icon(role.icon)+'</span>'+TODAY.dateStr+'</p><h1 class="topbar__title serif">'+titles[state.tab]+'</h1></div>'+
       '<button class="icon-btn icon-btn--sos" data-action="open-sos" aria-label="Аварийный протокол">'+icon('i-siren')+'</button>'+
@@ -589,10 +677,12 @@
 
   function renderMain(role){
     var body='';
-    if(state.tab==='home') body = role.level===0 ? homeOwner(role) : homeStaff(role);
+    if(state.tab==='home') body = role.id==='admin' ? adminHome(role) : (role.level===0 ? homeOwner(role) : homeStaff(role));
     else if(state.tab==='levels') body = levelsTab();
     else if(state.tab==='tasks') body = tasksTab(role);
     else if(state.tab==='objects') body = objectsTab(role);
+    else if(state.tab==='roles') body = rolesTab(role);
+    else if(state.tab==='matrix') body = matrixTab(role);
     else if(state.tab==='profile') body = profileTab(role);
     return '<main class="scroll">'+body+'</main>';
   }
@@ -600,24 +690,24 @@
   function homeOwner(role){
     var doneAll=0, totalAll=0, crit=0;
     ['l1','l2','l3','l4'].forEach(function(l){ doneAll+=tasksDone(l); totalAll+=tasksTotal(l); });
-    OBJECTS.forEach(function(o){ if(o.status==='crit') crit++; });
-    var okObjects = OBJECTS.filter(function(o){return o.status==='ok';}).length;
+    state.objects.forEach(function(o){ if(o.status==='crit') crit++; });
+    var okObjects = state.objects.filter(function(o){return o.status==='ok';}).length;
     var out = seasonBanner();
     out += '<section class="block"><div class="kpi-grid">'+
       kpi('i-tasks','Выполнено сегодня', doneAll+' / '+totalAll, 'по всем уровням', doneAll===totalAll&&totalAll>0?'c-ok':'')+
-      kpi('i-grid','Объекты в норме', okObjects+' / '+OBJECTS.length, 'по данным обхода', '')+
+      kpi('i-grid','Объекты в норме', okObjects+' / '+state.objects.length, 'по данным обхода', '')+
       kpi('i-alert','Критических событий', String(crit), crit>0?'требуют реакции':'нет событий', crit>0?'c-crit':'c-ok')+
       kpi('i-bank','Бюджет квартала', '71%', '640 000 ₽ из 900 000 ₽', '')+
     '</div></section>';
     out += '<section class="block"><div class="block__head"><span class="block__title">Уровни контроля</span><button class="block__link" data-tab="levels">Все<svg><use href="#i-chev-r"></use></svg></button></div>'+
-      '<div class="list">'+ROLES.filter(function(r){return r.level>0;}).map(function(r){
+      '<div class="list">'+ROLES.filter(isOperationalRole).map(function(r){
         return '<button class="row" data-action="open-level" data-id="'+r.id+'">'+
           '<span class="row__icon">'+icon(r.icon)+'</span>'+
           '<span class="row__body"><p class="row__title">'+r.name+'</p><p class="row__meta">Выполнено '+tasksDone(r.id)+' из '+tasksTotal(r.id)+'</p></span>'+
           icon('i-chev-r','row__chev')+
         '</button>';
       }).join('')+'</div></section>';
-    out += '<section class="block"><div class="block__head"><span class="block__title">Требуют внимания</span></div>'+objectList(OBJECTS.filter(function(o){return o.status!=='ok';}))+'</section>';
+    out += '<section class="block"><div class="block__head"><span class="block__title">Требуют внимания</span></div>'+objectList(state.objects.filter(function(o){return o.status!=='ok';}))+'</section>';
     return out;
   }
 
@@ -639,7 +729,7 @@
       '</div></section>';
     }
     out += '<section class="block"><div class="block__head"><span class="block__title">Объекты вашей зоны</span><button class="block__link" data-tab="objects">Все<svg><use href="#i-chev-r"></use></svg></button></div>'+
-      objectList(OBJECTS.slice(0,3))+'</section>';
+      objectList(state.objects.slice(0,3))+'</section>';
     return out;
   }
 
@@ -655,8 +745,21 @@
     return '<div class="kpi"><p class="kpi__label">'+icon(iconId)+label+'</p><p class="kpi__value '+(cls||'')+'">'+value+'</p><p class="kpi__sub">'+sub+'</p></div>';
   }
 
+  function raciCellClass(v){
+    if(v==='R') return 'r';
+    if(v==='A') return 'a';
+    if(v==='C') return 'c';
+    if(v==='I') return 'i';
+    return 'none';
+  }
+  function raciLegend(){
+    return '<div class="raci-legend">'+RACI_LEGEND.map(function(x){
+      return '<div class="raci-legend__item"><span class="raci-tag '+x.k+'">'+x.k.toUpperCase()+'</span><span>'+x.label+'</span></div>';
+    }).join('')+'</div>';
+  }
+
   function levelsTab(){
-    var out = '<section class="block"><div class="stack">'+ROLES.filter(function(r){return r.level>0;}).map(function(r){
+    var out = '<section class="block"><div class="stack">'+ROLES.filter(isOperationalRole).map(function(r){
       return '<button class="card card-pad" style="text-align:left;width:100%;display:flex;align-items:center;gap:14px;" data-action="open-level" data-id="'+r.id+'">'+
         ring(pct(r.id))+
         '<span style="flex:1;min-width:0;"><p class="row__title">'+r.name+'</p><p class="row__meta">'+r.desc+'</p></span>'+
@@ -665,8 +768,8 @@
     }).join('')+'</div></section>';
     out += '<section class="block"><div class="block__head"><span class="block__title">Матрица ответственности</span></div>'+
       '<div class="card card-pad"><table class="raci"><thead><tr><th>Операция</th><th>I</th><th>II</th><th>III</th><th>IV</th></tr></thead><tbody>'+
-      RACI.map(function(row){ return '<tr><td>'+row.op+'</td>'+row.r.map(function(v){ return '<td><span class="raci-tag '+v.toLowerCase()+'">'+v+'</span></td>'; }).join('')+'</tr>'; }).join('')+
-      '</tbody></table><p class="row__meta" style="margin-top:10px;">R — исполнитель, A — ответственный, C — согласующий, I — информируемый</p></div></section>';
+      state.raci.map(function(row){ return '<tr><td>'+row.op+'</td>'+row.r.map(function(v){ return '<td><span class="raci-tag '+raciCellClass(v)+'">'+(v||'—')+'</span></td>'; }).join('')+'</tr>'; }).join('')+
+      '</tbody></table>'+raciLegend()+'</div></section>';
     return out;
   }
 
@@ -687,27 +790,38 @@
       '<section class="block"><button class="btn btn--tint" data-action="open-camera">'+icon('i-camera')+'Фотофиксация с GPS-меткой</button></section>';
   }
 
-  function objectList(list){
+  function objectList(list, opts){
+    opts = opts || {};
     if(!list.length) return '<div class="empty">'+icon('i-check-c')+'<p>Все объекты в норме</p></div>';
     return '<div class="stack">'+list.map(function(o){
-      return '<button class="obj-card" data-action="open-object" data-id="'+o.id+'">'+
-        '<span class="obj-card__icon">'+icon(o.icon)+'</span>'+
+      var inner = '<span class="obj-card__icon">'+icon(o.icon)+'</span>'+
         '<span style="flex:1;min-width:0;">'+
           '<span class="obj-card__top"><span class="obj-card__name">'+o.name+'</span>'+statusPill(o.status)+'</span>'+
           '<p class="obj-card__zone">'+icon('i-pin','row__chev')+' '+o.zone+'</p>'+
           '<span class="obj-card__foot">'+levelChips(o.levels)+'<span>обновлено '+o.updated+'</span></span>'+
-        '</span>'+
-      '</button>';
+        '</span>';
+      if(opts.admin){
+        return '<div class="obj-card">'+
+          '<button class="obj-card__main" data-action="open-object" data-id="'+o.id+'">'+inner+'</button>'+
+          '<button class="delete-btn" data-action="delete-object" data-id="'+o.id+'" aria-label="Удалить объект">'+icon('i-trash')+'</button>'+
+        '</div>';
+      }
+      return '<button class="obj-card" data-action="open-object" data-id="'+o.id+'">'+inner+'</button>';
     }).join('')+'</div>';
   }
 
-  function objectsTab(){
-    return '<section class="block">'+objectList(OBJECTS)+'</section>';
+  function objectsTab(role){
+    var isAdmin = role.id==='admin';
+    var out = '<section class="block">'+objectList(state.objects, {admin:isAdmin})+'</section>';
+    if(isAdmin){
+      out += '<section class="block"><button class="btn btn--tint" data-action="open-object-form">'+icon('i-plus')+'Добавить объект</button></section>';
+    }
+    return out;
   }
 
   function profileTab(role){
     var out = '<section class="block"><div class="card card-pad" style="display:flex;align-items:center;gap:14px;">'+
-      '<span class="row__icon" style="width:52px;height:52px;border-radius:14px;'+(role.level===0?'background:var(--gold-soft);color:var(--gold);':'')+'">'+icon(role.icon)+'</span>'+
+      '<span class="row__icon'+roleTileClass(role)+'" style="width:52px;height:52px;border-radius:14px;">'+icon(role.icon)+'</span>'+
       '<div class="row__body"><p class="row__title" style="font-size:17.5px;">'+role.name+'</p><p class="row__meta" style="white-space:normal;">'+role.desc+'</p></div>'+
     '</div></section>';
 
@@ -717,6 +831,12 @@
         '<div class="kv"><span class="kv__k">Израсходовано</span><span class="kv__v">640 000 ₽</span></div>'+
         '<div class="kv"><span class="kv__k">Утверждённый лимит</span><span class="kv__v">900 000 ₽</span></div>'+
         '<div class="progress" style="margin-top:12px;"><div class="progress__fill gold" style="width:71%"></div></div>'+
+      '</div></section>';
+    } else if(role.id==='admin'){
+      out += '<section class="block"><div class="block__head"><span class="block__title">Данные системы</span></div><div class="card card-pad">'+
+        '<div class="kv"><span class="kv__k">Объектов в реестре</span><span class="kv__v">'+state.objects.length+'</span></div>'+
+        '<div class="kv"><span class="kv__k">Пользователей</span><span class="kv__v">'+state.users.length+'</span></div>'+
+        '<div class="kv"><span class="kv__k">Операций в матрице</span><span class="kv__v">'+state.raci.length+'</span></div>'+
       '</div></section>';
     } else {
       out += '<section class="block"><div class="block__head"><span class="block__title">Документооборот уровня</span></div><div class="card card-pad">'+
@@ -752,6 +872,90 @@
     return {l1:'Журнал смен + фото/GPS', l2:'Электронный чек-лист «до/после»', l3:'Акт подрядчика + видеодиагностика', l4:'Годовой технический отчёт'}[id];
   }
 
+  // ---- admin: overview, roster, RACI editor ----
+  function adminHome(role){
+    var crit = state.objects.filter(function(o){return o.status==='crit';}).length;
+    var out = seasonBanner();
+    out += '<section class="block"><div class="kpi-grid">'+
+      kpi('i-grid','Объектов', String(state.objects.length), 'в реестре системы', '')+
+      kpi('i-users','Пользователей', String(state.users.length), 'закреплено за ролями', '')+
+      kpi('i-admin','Операций в матрице', String(state.raci.length), 'зон ответственности', '')+
+      kpi('i-alert','Критических объектов', String(crit), crit>0?'требуют реакции':'нет событий', crit>0?'c-crit':'c-ok')+
+    '</div></section>';
+    out += '<section class="block"><div class="block__head"><span class="block__title">Управление</span></div><div class="list">'+
+      '<button class="row" data-tab="objects"><span class="row__icon">'+icon('i-grid')+'</span>'+
+        '<span class="row__body"><p class="row__title">Объекты</p><p class="row__meta">Добавление и удаление объектов системы</p></span>'+
+        icon('i-chev-r','row__chev')+'</button>'+
+      '<button class="row" data-tab="roles"><span class="row__icon indigo">'+icon('i-users')+'</span>'+
+        '<span class="row__body"><p class="row__title">Роли пользователей</p><p class="row__meta">Назначение сотрудников на роли</p></span>'+
+        icon('i-chev-r','row__chev')+'</button>'+
+      '<button class="row" data-tab="matrix"><span class="row__icon gold">'+icon('i-admin')+'</span>'+
+        '<span class="row__body"><p class="row__title">Матрица ответственности</p><p class="row__meta">RACI по операциям обслуживания</p></span>'+
+        icon('i-chev-r','row__chev')+'</button>'+
+    '</div></section>';
+    return out;
+  }
+
+  function rolesTab(){
+    var out = '<section class="block"><div class="list">'+state.users.map(function(u){
+      var r = roleObj(u.roleId);
+      return '<div class="row">'+
+        '<span class="row__icon'+(r?roleTileClass(r):'')+'">'+icon(r?r.icon:'i-user')+'</span>'+
+        '<span class="row__body"><p class="row__title">'+u.name+'</p><p class="row__meta">'+(r?r.name:'Без роли')+'</p></span>'+
+        '<button class="delete-btn" data-action="delete-user" data-id="'+u.id+'" aria-label="Удалить пользователя">'+icon('i-trash')+'</button>'+
+      '</div>';
+    }).join('')+'</div></section>';
+    out += '<section class="block"><button class="btn btn--tint" data-action="open-user-form">'+icon('i-plus')+'Добавить пользователя</button></section>';
+    return out;
+  }
+
+  function matrixTab(){
+    var out = '<section class="block"><div class="card card-pad"><table class="raci"><thead><tr><th>Операция</th><th>I</th><th>II</th><th>III</th><th>IV</th><th></th></tr></thead><tbody>'+
+      state.raci.map(function(row, ri){
+        return '<tr><td>'+row.op+'</td>'+row.r.map(function(v, ci){
+          return '<td><button class="raci-tag '+raciCellClass(v)+'" data-action="cycle-raci" data-row="'+ri+'" data-col="'+ci+'">'+(v||'—')+'</button></td>';
+        }).join('')+
+        '<td><button class="delete-btn" data-action="delete-raci-row" data-index="'+ri+'" aria-label="Удалить операцию">'+icon('i-trash')+'</button></td></tr>';
+      }).join('')+
+      '</tbody></table>'+raciLegend()+'<p class="row__meta" style="margin-top:10px;">Нажмите на ячейку, чтобы изменить назначение роли</p></div></section>';
+    out += '<section class="block"><button class="btn btn--tint" data-action="open-raci-form">'+icon('i-plus')+'Добавить операцию</button></section>';
+    return out;
+  }
+
+  function openObjectForm(){
+    state.formDraft = {status:'ok', levels:[]};
+    var body =
+      '<div class="form-field"><label>Название объекта</label><input type="text" id="fObjName" placeholder="Например, Дождеприёмник"></div>'+
+      '<div class="form-field"><label>Зона / расположение</label><input type="text" id="fObjZone" placeholder="Например, Южный сад"></div>'+
+      '<div class="form-field"><label>Статус</label><div class="segmented">'+
+        ['ok','warn','crit'].map(function(s){ return '<button type="button" class="segmented__opt'+(s==='ok'?' is-active':'')+'" data-action="form-status-pick" data-value="'+s+'">'+STATUS_LABEL[s]+'</button>'; }).join('')+
+      '</div></div>'+
+      '<div class="form-field"><label>Ответственные уровни</label><div class="chip-toggles">'+
+        [1,2,3,4].map(function(lv){ var r=ROLES[lv]; return '<button type="button" class="chip-toggle" data-action="form-level-toggle" data-value="'+lv+'">'+icon(r.icon)+r.tag+'</button>'; }).join('')+
+      '</div></div>'+
+      '<button class="btn btn--primary" data-action="save-object" style="margin-top:6px;">'+icon('i-check')+'Добавить объект</button>';
+    openSheet('Новый объект', body);
+  }
+
+  function openUserForm(){
+    state.formDraft = {roleId:null};
+    var body =
+      '<div class="form-field"><label>Имя сотрудника</label><input type="text" id="fUserName" placeholder="Например, Анна Смирнова"></div>'+
+      '<div class="form-field"><label>Роль</label><div class="chip-toggles">'+
+        ROLES.filter(function(r){return r.id!=='admin';}).map(function(r){ return '<button type="button" class="chip-toggle" data-action="form-role-pick" data-value="'+r.id+'">'+icon(r.icon)+r.name+'</button>'; }).join('')+
+      '</div></div>'+
+      '<button class="btn btn--primary" data-action="save-user" style="margin-top:6px;">'+icon('i-check')+'Добавить пользователя</button>';
+    openSheet('Новый пользователь', body);
+  }
+
+  function openRaciForm(){
+    var body =
+      '<div class="form-field"><label>Название операции</label><input type="text" id="fRaciOp" placeholder="Например, Осмотр колодцев"></div>'+
+      '<p class="row__meta" style="margin-bottom:14px;white-space:normal;">После добавления назначьте роли R/A/C/I, нажимая на ячейки таблицы.</p>'+
+      '<button class="btn btn--primary" data-action="save-raci-row">'+icon('i-check')+'Добавить операцию</button>';
+    openSheet('Новая операция', body);
+  }
+
   // ---- modal sheets ----
   function openSheet(title, bodyHtml){
     document.getElementById('sheetTitle').textContent = title;
@@ -761,7 +965,7 @@
   function closeSheet(){ document.getElementById('overlay').classList.remove('is-open'); }
 
   function openObject(id){
-    var o=null; for(var i=0;i<OBJECTS.length;i++){ if(OBJECTS[i].id===id) o=OBJECTS[i]; }
+    var o=null; for(var i=0;i<state.objects.length;i++){ if(state.objects[i].id===id) o=state.objects[i]; }
     if(!o) return;
     var body = '<div style="margin-bottom:14px;">'+statusPill(o.status)+'</div>'+
       (o.issue?'<p style="font-size:13.5px;color:var(--text-2);margin:0 0 16px;">'+o.issue+'</p>':'')+
@@ -866,6 +1070,126 @@
     if(updateBtn){
       if(swRegistration && swRegistration.waiting) swRegistration.waiting.postMessage('SKIP_WAITING');
       else window.location.reload();
+      return;
+    }
+
+    // ---- admin: forms ----
+    var openObjFormBtn = e.target.closest('[data-action="open-object-form"]');
+    if(openObjFormBtn){ openObjectForm(); return; }
+
+    var openUserFormBtn = e.target.closest('[data-action="open-user-form"]');
+    if(openUserFormBtn){ openUserForm(); return; }
+
+    var openRaciFormBtn = e.target.closest('[data-action="open-raci-form"]');
+    if(openRaciFormBtn){ openRaciForm(); return; }
+
+    var statusPickBtn = e.target.closest('[data-action="form-status-pick"]');
+    if(statusPickBtn){
+      state.formDraft.status = statusPickBtn.getAttribute('data-value');
+      var statusSiblings = statusPickBtn.parentElement.querySelectorAll('.segmented__opt');
+      statusSiblings.forEach(function(b){ b.classList.toggle('is-active', b===statusPickBtn); });
+      return;
+    }
+
+    var levelToggleBtn = e.target.closest('[data-action="form-level-toggle"]');
+    if(levelToggleBtn){
+      var lvVal = parseInt(levelToggleBtn.getAttribute('data-value'), 10);
+      var lvIdx = state.formDraft.levels.indexOf(lvVal);
+      if(lvIdx===-1) state.formDraft.levels.push(lvVal); else state.formDraft.levels.splice(lvIdx, 1);
+      levelToggleBtn.classList.toggle('is-active');
+      return;
+    }
+
+    var rolePickBtn = e.target.closest('[data-action="form-role-pick"]');
+    if(rolePickBtn){
+      state.formDraft.roleId = rolePickBtn.getAttribute('data-value');
+      var roleSiblings = rolePickBtn.parentElement.querySelectorAll('[data-action="form-role-pick"]');
+      roleSiblings.forEach(function(b){ b.classList.toggle('is-active', b===rolePickBtn); });
+      return;
+    }
+
+    var saveObjBtn = e.target.closest('[data-action="save-object"]');
+    if(saveObjBtn){
+      var nameEl = document.getElementById('fObjName');
+      var zoneEl = document.getElementById('fObjZone');
+      var objName = nameEl ? nameEl.value.trim() : '';
+      if(!objName){ if(nameEl) nameEl.focus(); return; }
+      nextObjectSeq++;
+      state.objects.push({
+        id: 'o'+nextObjectSeq,
+        name: objName,
+        zone: (zoneEl && zoneEl.value.trim()) || 'Не указано',
+        icon: 'i-drop',
+        status: state.formDraft.status,
+        updated: 'сегодня',
+        levels: state.formDraft.levels.slice()
+      });
+      state.formDraft = null;
+      save();
+      closeSheet();
+      render();
+      return;
+    }
+
+    var saveUserBtn = e.target.closest('[data-action="save-user"]');
+    if(saveUserBtn){
+      var uNameEl = document.getElementById('fUserName');
+      var uName = uNameEl ? uNameEl.value.trim() : '';
+      if(!uName || !state.formDraft.roleId){ if(uNameEl) uNameEl.focus(); return; }
+      nextUserSeq++;
+      state.users.push({id:'u'+nextUserSeq, name:uName, roleId:state.formDraft.roleId});
+      state.formDraft = null;
+      save();
+      closeSheet();
+      render();
+      return;
+    }
+
+    var saveRaciBtn = e.target.closest('[data-action="save-raci-row"]');
+    if(saveRaciBtn){
+      var opEl = document.getElementById('fRaciOp');
+      var opName = opEl ? opEl.value.trim() : '';
+      if(!opName){ if(opEl) opEl.focus(); return; }
+      state.raci.push({op:opName, r:['','','','']});
+      save();
+      closeSheet();
+      render();
+      return;
+    }
+
+    var delObjBtn = e.target.closest('[data-action="delete-object"]');
+    if(delObjBtn){
+      var delObjId = delObjBtn.getAttribute('data-id');
+      state.objects = state.objects.filter(function(o){ return o.id!==delObjId; });
+      save(); render();
+      return;
+    }
+
+    var delUserBtn = e.target.closest('[data-action="delete-user"]');
+    if(delUserBtn){
+      var delUserId = delUserBtn.getAttribute('data-id');
+      state.users = state.users.filter(function(u){ return u.id!==delUserId; });
+      save(); render();
+      return;
+    }
+
+    var delRaciBtn = e.target.closest('[data-action="delete-raci-row"]');
+    if(delRaciBtn){
+      var delRaciIdx = parseInt(delRaciBtn.getAttribute('data-index'), 10);
+      state.raci.splice(delRaciIdx, 1);
+      save(); render();
+      return;
+    }
+
+    var cycleRaciBtn = e.target.closest('[data-action="cycle-raci"]');
+    if(cycleRaciBtn){
+      var cycleRow = parseInt(cycleRaciBtn.getAttribute('data-row'), 10);
+      var cycleCol = parseInt(cycleRaciBtn.getAttribute('data-col'), 10);
+      var cycleOrder = ['', 'R', 'A', 'C', 'I'];
+      var cycleCur = state.raci[cycleRow].r[cycleCol] || '';
+      state.raci[cycleRow].r[cycleCol] = cycleOrder[(cycleOrder.indexOf(cycleCur)+1) % cycleOrder.length];
+      save();
+      render();
       return;
     }
   });
