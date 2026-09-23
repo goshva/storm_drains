@@ -143,7 +143,9 @@
     padding:14px 20px 14px;
   }
   .topbar__row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
-  .topbar__eyebrow{font-size:12px;letter-spacing:.02em;text-transform:uppercase;color:var(--text-3);font-weight:600;margin:0 0 2px;}
+  .topbar__eyebrow{font-size:12px;letter-spacing:.02em;text-transform:uppercase;color:var(--text-3);font-weight:600;margin:0 0 2px;display:flex;align-items:center;gap:5px;}
+  .topbar__roleicon{display:inline-flex;color:var(--accent);}
+  .topbar__roleicon svg{width:13px;height:13px;}
   .topbar__title{font-weight:700;font-size:29px;line-height:1.15;margin:0;letter-spacing:-.02em;}
   .icon-btn{
     width:38px;height:38px;border-radius:50%;border:none;
@@ -175,7 +177,7 @@
 
   section.block{margin-bottom:22px;}
   .block__head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;gap:10px;}
-  .block__title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;color:var(--text-2);}
+  .block__title{font-size:13.5px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;color:var(--text-2);}
   .block__link{font-size:14.5px;font-weight:500;color:var(--accent);background:none;border:none;display:flex;align-items:center;gap:2px;}
   .block__link svg{width:15px;height:15px;}
 
@@ -188,15 +190,15 @@
   }
   .banner__tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;background:rgba(255,255,255,.18);padding:5px 10px 5px 8px;border-radius:100px;}
   .banner__tag svg{width:14px;height:14px;}
-  .banner__title{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:10px 0 6px;}
-  .banner__text{font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.88);margin:0;}
+  .banner__title{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:10px 0 6px;}
+  .banner__text{font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.88);margin:0;}
 
   .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .kpi{background:var(--surface);border:none;border-radius:16px;padding:14px;box-shadow:var(--shadow-1);}
-  .kpi__label{font-size:11.5px;color:var(--text-2);font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+  .kpi__label{font-size:12px;color:var(--text-2);font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:8px;}
   .kpi__label svg{width:14px;height:14px;color:var(--text-3);}
-  .kpi__value{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
-  .kpi__sub{font-size:11.5px;color:var(--text-3);margin-top:3px;font-variant-numeric:tabular-nums;}
+  .kpi__value{font-size:25px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+  .kpi__sub{font-size:12px;color:var(--text-3);margin-top:3px;font-variant-numeric:tabular-nums;}
   .kpi__value.c-crit{color:var(--critical);}
   .kpi__value.c-ok{color:var(--success);}
 
@@ -207,24 +209,29 @@
   .row__icon svg{width:18px;height:18px;}
   .row__icon.gold{background:var(--gold-soft);color:var(--gold);}
   .row__body{flex:1;min-width:0;}
-  .row__title{font-size:15px;font-weight:500;margin:0;}
-  .row__meta{font-size:13px;color:var(--text-2);margin:2px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .row__title{font-size:16px;font-weight:500;margin:0;}
+  .row__meta{font-size:13.5px;color:var(--text-2);margin:2px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .row__chev{width:17px;height:17px;color:var(--text-3);flex:none;}
 
-  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:100px;white-space:nowrap;}
-  .pill svg{width:11px;height:11px;}
+  .pill{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;flex:none;padding:0;}
+  .pill svg{width:13px;height:13px;}
   .pill--ok{background:var(--success-soft);color:var(--success);}
   .pill--warn{background:var(--warning-soft);color:var(--warning);}
   .pill--crit{background:var(--critical-soft);color:var(--critical);}
   .pill--neutral{background:var(--surface-2);color:var(--text-2);}
 
+  .level-chips{display:inline-flex;gap:4px;}
+  .level-chip{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);flex:none;}
+  .level-chip.gold{background:var(--gold-soft);color:var(--gold);}
+  .level-chip svg{width:12px;height:12px;}
+
   .obj-card{display:flex;gap:12px;padding:14px;background:var(--surface);border:none;border-radius:16px;text-align:left;width:100%;box-shadow:var(--shadow-1);}
   .obj-card__icon{width:42px;height:42px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none;}
   .obj-card__icon svg{width:20px;height:20px;}
   .obj-card__top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}
-  .obj-card__name{font-size:15px;font-weight:600;margin:0;}
-  .obj-card__zone{font-size:12.5px;color:var(--text-2);margin:2px 0 8px;}
-  .obj-card__foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11.5px;color:var(--text-3);}
+  .obj-card__name{font-size:16px;font-weight:600;margin:0;}
+  .obj-card__zone{font-size:13px;color:var(--text-2);margin:2px 0 8px;}
+  .obj-card__foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--text-3);}
   .stack{display:flex;flex-direction:column;gap:10px;}
 
   .task-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--border-soft);width:100%;background:none;border-left:none;border-right:none;border-top:none;text-align:left;}
@@ -234,8 +241,8 @@
   .task-row.is-done .check{background:var(--accent);border-color:var(--accent);}
   .task-row.is-done .check svg{opacity:1;transform:scale(1);}
   .task-row.is-done .task-title{color:var(--text-3);text-decoration:line-through;text-decoration-color:var(--border);}
-  .task-title{font-size:15px;font-weight:500;margin:0;}
-  .task-note{font-size:12.5px;color:var(--text-2);margin:2px 0 0;}
+  .task-title{font-size:16px;font-weight:500;margin:0;}
+  .task-note{font-size:13px;color:var(--text-2);margin:2px 0 0;}
 
   .progress{height:6px;border-radius:100px;background:var(--surface-2);overflow:hidden;}
   .progress__fill{height:100%;border-radius:100px;background:var(--accent);}
@@ -265,8 +272,8 @@
   .picker__brand{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:30px;}
   .picker__mark{width:62px;height:62px;border-radius:18px;background:var(--accent);color:#FFFFFF;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:var(--shadow-2);}
   .picker__mark svg{width:30px;height:30px;}
-  .picker__name{font-weight:700;font-size:26px;letter-spacing:-.02em;margin:0;}
-  .picker__sub{font-size:13.5px;color:var(--text-2);margin:6px 0 0;max-width:280px;}
+  .picker__name{font-weight:700;font-size:27px;letter-spacing:-.02em;margin:0;}
+  .picker__sub{font-size:14.5px;color:var(--text-2);margin:6px 0 0;max-width:280px;}
   .picker__date{margin-top:14px;font-size:11.5px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--text-2);background:var(--surface);border:none;padding:6px 12px;border-radius:100px;box-shadow:var(--shadow-1);}
   .picker__label{font-size:12px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--text-3);margin:4px 4px 10px;}
 
@@ -277,15 +284,15 @@
   .overlay.is-open .sheet{transform:translateY(0);}
   .sheet__grab{width:36px;height:5px;border-radius:100px;background:var(--border);margin:10px auto 4px;flex:none;}
   .sheet__head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:6px 20px 12px;flex:none;}
-  .sheet__title{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:0;padding-right:8px;}
+  .sheet__title{font-size:21px;font-weight:700;letter-spacing:-.01em;margin:0;padding-right:8px;}
   .sheet__body{padding:0 20px 24px;overflow-y:auto;}
 
-  .kv{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft);font-size:13.5px;}
+  .kv{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft);font-size:14.5px;}
   .kv:last-child{border-bottom:none;}
   .kv__k{color:var(--text-2);}
   .kv__v{font-weight:600;text-align:right;font-variant-numeric:tabular-nums;}
 
-  .raci{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .raci{width:100%;border-collapse:collapse;font-size:13px;}
   .raci th,.raci td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--border-soft);}
   .raci th{color:var(--text-3);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;}
   .raci td:first-child,.raci th:first-child{text-align:left;color:var(--text-2);font-weight:600;}
@@ -300,6 +307,18 @@
   .empty p{font-size:13.5px;margin:0;}
 
   [hidden]{display:none !important;}
+
+  .toast{
+    position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+    width:calc(100% - 32px);max-width:400px;z-index:15;
+    background:var(--sheet-bg);color:var(--text);border-radius:16px;padding:12px 14px;
+    display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-2);
+  }
+  .toast__icon{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none;}
+  .toast__icon svg{width:16px;height:16px;}
+  .toast--offline .toast__icon{background:var(--warning-soft);color:var(--warning);}
+  .toast__text{flex:1;font-size:13.5px;font-weight:500;line-height:1.3;}
+  .toast__action{flex:none;background:var(--accent);color:#FFFFFF;border:none;font-size:13px;font-weight:600;padding:8px 13px;border-radius:100px;}
 </style>
 </head>
 <body>
@@ -330,12 +349,17 @@
 <symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5c8.3 0 13.5-5.3 13.5-13.5-8.3 0-13.5 5.3-13.5 13.5Z"/><path d="M5.3 19.2c2-4.3 5.2-7.5 9.4-9.6"/></symbol>
 <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.6" cy="8.6" r="3"/><path d="M2.8 19c.8-3.6 3-5.2 5.8-5.2s5 1.6 5.8 5.2"/><circle cx="17" cy="9.4" r="2.2"/><path d="M14.6 13.7c2.3.2 4 1.7 4.6 5.3"/></symbol>
 <symbol id="i-siren" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5a5.5 5.5 0 0 1 5.5 5.5v6H6.5v-6A5.5 5.5 0 0 1 12 3.5Z"/><path d="M4.5 20.5h15"/><path d="M12 3.5V2"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.7L4 15.5"/><path d="M4 20v-4.5h4.5"/></symbol>
+<symbol id="i-wifi-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M8.5 16.3a5 5 0 0 1 7 0"/><path d="M5.3 13a9.5 9.5 0 0 1 3-2"/><path d="M12.7 8.05A9.5 9.5 0 0 1 18.7 10"/><path d="M2 8.8a13.4 13.4 0 0 1 3.6-2.6"/><path d="M15.5 5.4A13.4 13.4 0 0 1 22 8.8"/><path d="M12 19.5h.01"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M7.5 10 12 14.5 16.5 10"/><path d="M4.5 17.5v2a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5v-2"/></symbol>
 </defs>
 </svg>
 
 <div class="stage">
   <div class="app-frame" id="app"></div>
 </div>
+
+<div class="toast" id="toast" hidden></div>
 
 <div class="overlay" id="overlay">
   <div class="sheet" id="sheet">
@@ -394,13 +418,13 @@
   };
 
   var OBJECTS = [
-    {id:'o1', name:'Дождеприёмник', zone:'Главный въезд', icon:'i-drop', status:'ok', updated:'сегодня', level:'Уровень I'},
-    {id:'o2', name:'Лоток открытый', zone:'Восточный сад', icon:'i-drop', status:'warn', updated:'2 дня назад', level:'Уровень I–II', issue:'Скопление опавшей листвы снижает сток'},
-    {id:'o3', name:'Песколовка', zone:'Западный периметр', icon:'i-grid', status:'ok', updated:'5 дней назад', level:'Уровень II'},
-    {id:'o4', name:'Коллектор №1', zone:'Хозяйственный двор', icon:'i-grid', status:'ok', updated:'3 недели назад', level:'Уровень III'},
-    {id:'o5', name:'Колодец смотровой', zone:'Аллея у пруда', icon:'i-alert', status:'crit', updated:'сегодня', level:'Уровень III', issue:'Подпор воды, требуется внеплановая прочистка'},
-    {id:'o6', name:'Насосная камера', zone:'Нижний парк', icon:'i-gauge', status:'ok', updated:'1 месяц назад', level:'Уровень III–IV'},
-    {id:'o7', name:'Водосток кровельный', zone:'Главный дом, южный фасад', icon:'i-drop', status:'warn', updated:'4 дня назад', level:'Уровень I', issue:'Ослабло крепление хомута'}
+    {id:'o1', name:'Дождеприёмник', zone:'Главный въезд', icon:'i-drop', status:'ok', updated:'сегодня', levels:[1]},
+    {id:'o2', name:'Лоток открытый', zone:'Восточный сад', icon:'i-drop', status:'warn', updated:'2 дня назад', levels:[1,2], issue:'Скопление опавшей листвы снижает сток'},
+    {id:'o3', name:'Песколовка', zone:'Западный периметр', icon:'i-grid', status:'ok', updated:'5 дней назад', levels:[2]},
+    {id:'o4', name:'Коллектор №1', zone:'Хозяйственный двор', icon:'i-grid', status:'ok', updated:'3 недели назад', levels:[3]},
+    {id:'o5', name:'Колодец смотровой', zone:'Аллея у пруда', icon:'i-alert', status:'crit', updated:'сегодня', levels:[3], issue:'Подпор воды, требуется внеплановая прочистка'},
+    {id:'o6', name:'Насосная камера', zone:'Нижний парк', icon:'i-gauge', status:'ok', updated:'1 месяц назад', levels:[3,4]},
+    {id:'o7', name:'Водосток кровельный', zone:'Главный дом, южный фасад', icon:'i-drop', status:'warn', updated:'4 дня назад', levels:[1], issue:'Ослабло крепление хомута'}
   ];
 
   var SEASONS = {
@@ -468,19 +492,35 @@
     tab: 'home',
     checked: saved && saved.checked ? saved.checked : {},
     theme: loadTheme(),
-    modal: null
+    modal: null,
+    online: navigator.onLine,
+    updateReady: false,
+    canInstall: false
   };
   applyTheme(state.theme);
+
+  function isStandalone(){
+    return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  }
 
   function roleObj(id){ for(var i=0;i<ROLES.length;i++){ if(ROLES[i].id===id) return ROLES[i]; } return null; }
   function tasksDone(levelId){ var c = state.checked[levelId]||{}; return Object.keys(c).filter(function(k){return c[k];}).length; }
   function tasksTotal(levelId){ return (TASKS[levelId]||[]).length; }
   function pct(levelId){ var t=tasksTotal(levelId); return t? Math.round(tasksDone(levelId)/t*100):0; }
 
+  var STATUS_LABEL = {ok:'Норма', warn:'Внимание', crit:'Критично'};
   function statusPill(status){
-    if(status==='ok') return '<span class="pill pill--ok">'+icon('i-check-c')+'Норма</span>';
-    if(status==='warn') return '<span class="pill pill--warn">'+icon('i-alert')+'Внимание</span>';
-    return '<span class="pill pill--crit">'+icon('i-alert')+'Критично</span>';
+    var cls = status==='ok' ? 'pill--ok' : (status==='warn' ? 'pill--warn' : 'pill--crit');
+    var ic = status==='ok' ? 'i-check-c' : 'i-alert';
+    return '<span class="pill '+cls+'" title="'+STATUS_LABEL[status]+'" aria-label="'+STATUS_LABEL[status]+'">'+icon(ic)+'</span>';
+  }
+
+  function levelChip(levelNum){
+    var r = ROLES[levelNum]; if(!r) return '';
+    return '<span class="level-chip'+(levelNum===0?' gold':'')+'" title="'+r.tag+'" aria-label="'+r.tag+'">'+icon(r.icon)+'</span>';
+  }
+  function levelChips(levels){
+    return '<span class="level-chips">'+(levels||[]).map(levelChip).join('')+'</span>';
   }
 
   function ring(percent, colorVar){
@@ -517,7 +557,7 @@
     var rows = ROLES.map(function(r){
       return '<button class="row" data-action="select-role" data-id="'+r.id+'">'+
         '<span class="row__icon'+(r.level===0?' gold':'')+'">'+icon(r.icon)+'</span>'+
-        '<span class="row__body"><p class="row__title">'+r.name+'</p><p class="row__meta">'+r.tag+' · '+r.desc+'</p></span>'+
+        '<span class="row__body"><p class="row__title">'+r.name+'</p><p class="row__meta">'+r.desc+'</p></span>'+
         icon('i-chev-r','row__chev')+
       '</button>';
     }).join('');
@@ -536,7 +576,7 @@
   function renderHeader(role){
     var titles = {home:'Сегодня', tasks:'Задачи', objects:'Объекты', levels:'Уровни контроля', profile:'Профиль'};
     return '<header class="topbar"><div class="topbar__row">'+
-      '<div><p class="topbar__eyebrow">'+role.tag+' · '+TODAY.dateStr+'</p><h1 class="topbar__title serif">'+titles[state.tab]+'</h1></div>'+
+      '<div><p class="topbar__eyebrow"><span class="topbar__roleicon" title="'+role.tag+'" aria-label="'+role.tag+'">'+icon(role.icon)+'</span>'+TODAY.dateStr+'</p><h1 class="topbar__title serif">'+titles[state.tab]+'</h1></div>'+
       '<button class="icon-btn icon-btn--sos" data-action="open-sos" aria-label="Аварийный протокол">'+icon('i-siren')+'</button>'+
     '</div></header>';
   }
@@ -573,7 +613,7 @@
       '<div class="list">'+ROLES.filter(function(r){return r.level>0;}).map(function(r){
         return '<button class="row" data-action="open-level" data-id="'+r.id+'">'+
           '<span class="row__icon">'+icon(r.icon)+'</span>'+
-          '<span class="row__body"><p class="row__title">'+r.name+'</p><p class="row__meta">'+r.tag+' · выполнено '+tasksDone(r.id)+' из '+tasksTotal(r.id)+'</p></span>'+
+          '<span class="row__body"><p class="row__title">'+r.name+'</p><p class="row__meta">Выполнено '+tasksDone(r.id)+' из '+tasksTotal(r.id)+'</p></span>'+
           icon('i-chev-r','row__chev')+
         '</button>';
       }).join('')+'</div></section>';
@@ -619,7 +659,7 @@
     var out = '<section class="block"><div class="stack">'+ROLES.filter(function(r){return r.level>0;}).map(function(r){
       return '<button class="card card-pad" style="text-align:left;width:100%;display:flex;align-items:center;gap:14px;" data-action="open-level" data-id="'+r.id+'">'+
         ring(pct(r.id))+
-        '<span style="flex:1;"><p class="row__title">'+r.name+'</p><p class="row__meta">'+r.tag+' · '+r.desc+'</p></span>'+
+        '<span style="flex:1;min-width:0;"><p class="row__title">'+r.name+'</p><p class="row__meta">'+r.desc+'</p></span>'+
         icon('i-chev-r','row__chev')+
       '</button>';
     }).join('')+'</div></section>';
@@ -655,7 +695,7 @@
         '<span style="flex:1;min-width:0;">'+
           '<span class="obj-card__top"><span class="obj-card__name">'+o.name+'</span>'+statusPill(o.status)+'</span>'+
           '<p class="obj-card__zone">'+icon('i-pin','row__chev')+' '+o.zone+'</p>'+
-          '<span class="obj-card__foot"><span>'+o.level+'</span><span>обновлено '+o.updated+'</span></span>'+
+          '<span class="obj-card__foot">'+levelChips(o.levels)+'<span>обновлено '+o.updated+'</span></span>'+
         '</span>'+
       '</button>';
     }).join('')+'</div>';
@@ -668,7 +708,7 @@
   function profileTab(role){
     var out = '<section class="block"><div class="card card-pad" style="display:flex;align-items:center;gap:14px;">'+
       '<span class="row__icon" style="width:52px;height:52px;border-radius:14px;'+(role.level===0?'background:var(--gold-soft);color:var(--gold);':'')+'">'+icon(role.icon)+'</span>'+
-      '<div><p class="row__title" style="font-size:16.5px;">'+role.name+'</p><p class="row__meta">'+role.tag+' · '+role.desc+'</p></div>'+
+      '<div class="row__body"><p class="row__title" style="font-size:17.5px;">'+role.name+'</p><p class="row__meta" style="white-space:normal;">'+role.desc+'</p></div>'+
     '</div></section>';
 
     if(role.level===0){
@@ -685,10 +725,11 @@
       '</div></section>';
     }
 
-    out += '<section class="block"><div class="block__head"><span class="block__title">'+TODAY.season.name+'</span></div><div class="card card-pad"><ul style="margin:0;padding-left:18px;color:var(--text);font-size:13.5px;line-height:1.7;">'+
+    out += '<section class="block"><div class="block__head"><span class="block__title">'+TODAY.season.name+'</span></div><div class="card card-pad"><ul style="margin:0;padding-left:18px;color:var(--text);font-size:14.5px;line-height:1.7;">'+
       TODAY.season.points.map(function(p){return '<li>'+p+'</li>';}).join('')+'</ul></div></section>';
 
     out += themeControl();
+    out += installControl();
 
     out += '<section class="block"><button class="btn btn--ghost" data-action="switch-role">'+icon('i-chev-l')+'Сменить роль</button></section>';
     return out;
@@ -700,6 +741,11 @@
       '<div class="segmented">'+opts.map(function(o){
         return '<button class="segmented__opt'+(state.theme===o.v?' is-active':'')+'" data-action="set-theme" data-value="'+o.v+'">'+o.l+'</button>';
       }).join('')+'</div></section>';
+  }
+
+  function installControl(){
+    if(!state.canInstall || isStandalone()) return '';
+    return '<section class="block"><button class="btn btn--tint" data-action="install-app">'+icon('i-download')+'Установить приложение</button></section>';
   }
 
   function docType(id){
@@ -721,7 +767,7 @@
       (o.issue?'<p style="font-size:13.5px;color:var(--text-2);margin:0 0 16px;">'+o.issue+'</p>':'')+
       '<div class="card card-pad">'+
         '<div class="kv"><span class="kv__k">Зона</span><span class="kv__v">'+o.zone+'</span></div>'+
-        '<div class="kv"><span class="kv__k">Ответственный уровень</span><span class="kv__v">'+o.level+'</span></div>'+
+        '<div class="kv"><span class="kv__k">Ответственный уровень</span><span class="kv__v">'+levelChips(o.levels)+'</span></div>'+
         '<div class="kv"><span class="kv__k">Последняя проверка</span><span class="kv__v">'+o.updated+'</span></div>'+
       '</div>'+
       '<div style="margin-top:16px;"><button class="btn btn--primary" data-action="close-modal">'+icon('i-check')+'Отметить как проверено</button></div>';
@@ -802,18 +848,95 @@
 
     var themeBtn = e.target.closest('[data-action="set-theme"]');
     if(themeBtn){ setTheme(themeBtn.getAttribute('data-value')); return; }
+
+    var installBtn = e.target.closest('[data-action="install-app"]');
+    if(installBtn){
+      if(deferredInstallPrompt){
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.finally(function(){
+          deferredInstallPrompt = null;
+          state.canInstall = false;
+          render();
+        });
+      }
+      return;
+    }
+
+    var updateBtn = e.target.closest('[data-action="apply-update"]');
+    if(updateBtn){
+      if(swRegistration && swRegistration.waiting) swRegistration.waiting.postMessage('SKIP_WAITING');
+      else window.location.reload();
+      return;
+    }
   });
 
-  render();
-})();
-</script>
+  // ---- PWA: offline indicator, update flow, install prompt ----
+  var swRegistration = null;
+  var deferredInstallPrompt = null;
 
-<script>
+  function updateToast(){
+    var el = document.getElementById('toast');
+    if(!el) return;
+    if(state.updateReady){
+      el.className = 'toast';
+      el.innerHTML = '<span class="toast__icon">'+icon('i-refresh')+'</span>'+
+        '<span class="toast__text">Доступно обновление приложения</span>'+
+        '<button class="toast__action" data-action="apply-update">Обновить</button>';
+      el.hidden = false;
+    } else if(!state.online){
+      el.className = 'toast toast--offline';
+      el.innerHTML = '<span class="toast__icon">'+icon('i-wifi-off')+'</span>'+
+        '<span class="toast__text">Нет подключения. Данные сохраняются локально</span>';
+      el.hidden = false;
+    } else {
+      el.hidden = true;
+      el.innerHTML = '';
+    }
+  }
+
+  window.addEventListener('online', function(){ state.online = true; updateToast(); });
+  window.addEventListener('offline', function(){ state.online = false; updateToast(); });
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    state.canInstall = true;
+    if(state.tab==='profile') render();
+  });
+  window.addEventListener('appinstalled', function(){
+    deferredInstallPrompt = null;
+    state.canInstall = false;
+    if(state.tab==='profile') render();
+  });
+
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('sw.js').catch(function(){});
+      navigator.serviceWorker.register('sw.js').then(function(reg){
+        swRegistration = reg;
+        if(reg.waiting && navigator.serviceWorker.controller){ state.updateReady = true; updateToast(); }
+        reg.addEventListener('updatefound', function(){
+          var installing = reg.installing;
+          if(!installing) return;
+          installing.addEventListener('statechange', function(){
+            if(installing.state==='installed' && navigator.serviceWorker.controller){
+              state.updateReady = true;
+              updateToast();
+            }
+          });
+        });
+      }).catch(function(){});
+    });
+    var refreshedOnce = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if(refreshedOnce) return;
+      refreshedOnce = true;
+      window.location.reload();
     });
   }
+
+  render();
+  updateToast();
+})();
 </script>
 
 </body>
