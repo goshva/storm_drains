@@ -226,13 +226,6 @@
   .row__meta{font-size:13.5px;color:var(--text-2);margin:2px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .row__chev{width:17px;height:17px;color:var(--text-3);flex:none;}
 
-  .pill{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;flex:none;padding:0;}
-  .pill svg{width:13px;height:13px;}
-  .pill--ok{background:var(--success-soft);color:var(--success);}
-  .pill--warn{background:var(--warning-soft);color:var(--warning);}
-  .pill--crit{background:var(--critical-soft);color:var(--critical);}
-  .pill--neutral{background:var(--surface-2);color:var(--text-2);}
-
   .level-chips{display:inline-flex;gap:4px;}
   .level-chip{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);flex:none;}
   .level-chip.gold{background:var(--gold-soft);color:var(--gold);}
@@ -247,6 +240,10 @@
   .obj-card__zone{font-size:13px;color:var(--text-2);margin:2px 0 8px;}
   .obj-card__foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--text-3);}
   .stack{display:flex;flex-direction:column;gap:10px;}
+
+  .accent-ok{border-left:4px solid var(--success-soft);}
+  .accent-warn{border-left:4px solid var(--warning-soft);}
+  .accent-crit{border-left:4px solid var(--critical-soft);}
 
   .task-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--border-soft);width:100%;background:none;border-left:none;border-right:none;border-top:none;text-align:left;}
   .task-row:last-child{border-bottom:none;}
@@ -584,11 +581,6 @@
   function pct(levelId){ var t=tasksTotal(levelId); return t? Math.round(tasksDone(levelId)/t*100):0; }
 
   var STATUS_LABEL = {ok:'Норма', warn:'Внимание', crit:'Критично'};
-  function statusPill(status){
-    var cls = status==='ok' ? 'pill--ok' : (status==='warn' ? 'pill--warn' : 'pill--crit');
-    var ic = status==='ok' ? 'i-check-c' : 'i-alert';
-    return '<span class="pill '+cls+'" title="'+STATUS_LABEL[status]+'" aria-label="'+STATUS_LABEL[status]+'">'+icon(ic)+'</span>';
-  }
 
   function levelChip(levelNum){
     var r = ROLES[levelNum]; if(!r) return '';
@@ -794,19 +786,20 @@
     opts = opts || {};
     if(!list.length) return '<div class="empty">'+icon('i-check-c')+'<p>Все объекты в норме</p></div>';
     return '<div class="stack">'+list.map(function(o){
+      var accentCls = 'accent-'+o.status;
       var inner = '<span class="obj-card__icon">'+icon(o.icon)+'</span>'+
         '<span style="flex:1;min-width:0;">'+
-          '<span class="obj-card__top"><span class="obj-card__name">'+o.name+'</span>'+statusPill(o.status)+'</span>'+
+          '<span class="obj-card__top"><span class="obj-card__name">'+o.name+'</span></span>'+
           '<p class="obj-card__zone">'+icon('i-pin','row__chev')+' '+o.zone+'</p>'+
           '<span class="obj-card__foot">'+levelChips(o.levels)+'<span>обновлено '+o.updated+'</span></span>'+
         '</span>';
       if(opts.admin){
-        return '<div class="obj-card">'+
+        return '<div class="obj-card '+accentCls+'">'+
           '<button class="obj-card__main" data-action="open-object" data-id="'+o.id+'">'+inner+'</button>'+
           '<button class="delete-btn" data-action="delete-object" data-id="'+o.id+'" aria-label="Удалить объект">'+icon('i-trash')+'</button>'+
         '</div>';
       }
-      return '<button class="obj-card" data-action="open-object" data-id="'+o.id+'">'+inner+'</button>';
+      return '<button class="obj-card '+accentCls+'" data-action="open-object" data-id="'+o.id+'">'+inner+'</button>';
     }).join('')+'</div>';
   }
 
@@ -967,9 +960,8 @@
   function openObject(id){
     var o=null; for(var i=0;i<state.objects.length;i++){ if(state.objects[i].id===id) o=state.objects[i]; }
     if(!o) return;
-    var body = '<div style="margin-bottom:14px;">'+statusPill(o.status)+'</div>'+
-      (o.issue?'<p style="font-size:13.5px;color:var(--text-2);margin:0 0 16px;">'+o.issue+'</p>':'')+
-      '<div class="card card-pad">'+
+    var body = (o.issue?'<p style="font-size:13.5px;color:var(--text-2);margin:0 0 16px;">'+o.issue+'</p>':'')+
+      '<div class="card card-pad accent-'+o.status+'">'+
         '<div class="kv"><span class="kv__k">Зона</span><span class="kv__v">'+o.zone+'</span></div>'+
         '<div class="kv"><span class="kv__k">Ответственный уровень</span><span class="kv__v">'+levelChips(o.levels)+'</span></div>'+
         '<div class="kv"><span class="kv__k">Последняя проверка</span><span class="kv__v">'+o.updated+'</span></div>'+
